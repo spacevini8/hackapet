@@ -3,6 +3,8 @@ from blinka_displayio_pygamedisplay import PyGameDisplay
 import pygame
 import random
 import time
+from adafruit_display_text import label
+import random
 
 pygame.init()
 display = PyGameDisplay(width=128, height=128)
@@ -74,6 +76,16 @@ while True:
                 erebus_sprite.x += speed
             elif event.key == pygame.K_UP:
                 erebus_sprite.y -= speed
+    
+    if erebus_sprite.x < 0:
+        erebus_sprite.x = 0
+    elif erebus_sprite.x > display.width - tile_width:
+        erebus_sprite.x = display.width - tile_width
+
+    erebus_sprite.x = erebus_sprite.x
+    
+    if erebus_sprite.y < 0:
+        erebus_sprite.y = display.height - tile_height
     
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
