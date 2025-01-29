@@ -16,7 +16,26 @@ bg_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+tile_width = 32
+tile_height = 32
+
+door_1 = displayio.OnDiskBitmap("door_1.bmp")
+
+door_1_sprite = displayio.TileGrid(
+	door_1, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+door_2 = displayio.OnDiskBitmap("door_2.bmp")
+
+door_2_sprite = displayio.TileGrid(
+	door_2, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
 splash.append(bg_sprite)
+splash.append(door_1_sprite)
+splash.append(door_2_sprite)
 
 erebus_sheet = displayio.OnDiskBitmap("erebus_sheet.bmp")
 
