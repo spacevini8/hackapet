@@ -12,11 +12,12 @@ You have to do a couple things to keep the station afloat
 - Keep the [AME](https://wiki.spacestation14.com/wiki/Power#The_Antimatter_Engine) running! make sure it's fueled up and no pesky [antags](https://wiki.spacestation14.com/wiki/Antagonist#Syndicate_agent) mess with it!
 - Keep [solars](https://wiki.spacestation14.com/wiki/Power#Solar_Power) in check!
 - Keep the [singulo](https://wiki.spacestation14.com/wiki/Power#Gravitational_Singularity_Engine) from loosing!
+- Keep the [TEG](https://wiki.spacestation14.com/wiki/Power#The_Thermoelectric_Generator_(TEG)) running, though even I have no idea how to do that!
 - Get screamed at by the crew! It's part of the job!
 
 ## WIP
 
-The game **_isn't finished yet_** and probably won't be completed by the deadline but I'll keep updating it even after the deadline!
+The game probably won't be completed by the deadline but I'll keep updating it even after the deadline
 
 ## info
 
