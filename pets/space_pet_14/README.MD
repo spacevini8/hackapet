@@ -17,7 +17,7 @@ You have to do a couple things to keep the station afloat
 
 ## WIP
 
-The game probably won't be completed by the deadline but I'll keep updating it even after the deadline
+The game **_isn't finished yet_** and probably won't be completed by the deadline but I'll keep updating it even after the deadline!
 
 ## info
 
