@@ -5,11 +5,18 @@ import random
 import time
 from adafruit_display_text import label
 import random
+import sys
+import os
 
 pygame.init()
 display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
+pygame.font.init()
+
+programIcon = pygame.image.load('Erebus_Nightflitter.bmp')
+
+pygame.display.set_icon(programIcon)
 
 space_station_background = displayio.OnDiskBitmap("spacestationbackground.bmp")
 
@@ -58,8 +65,31 @@ erebus_sprite = displayio.TileGrid(
 
 splash.append(erebus_sprite)
 
+#here be warnings
+score = 10
+score_increment = 10
+warning = False
+warning_door_1 = False
+warning_door_2 = False
+warning_AME = False
+warning_Singulo = False
+warning_TEG = False
 frame = 0
 speed = 32
+
+class Score(object):
+    def __init__(self):
+        self.black = 0,0,0
+        self.count = 0
+        self.font = pygame.font.SysFont("comicsans",50, True , True)
+        self.text = self.font.render("Score : "+str(self.count),1,self.black)
+
+    def show_score(self, screen):
+        screen.blit(self.text, (100 ,100))
+
+    def score_up(self):
+        self.count += 1
+        self.text = self.font.render("Score : "+str(self.count),1,self.black)
 
 while True:
     for event in pygame.event.get():
@@ -70,13 +100,14 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 erebus_sprite.x -= speed
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 erebus_sprite.x += speed
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP or event.key == pygame.K_w:
                 erebus_sprite.y -= speed
     
+    #wrap around the sides
     if erebus_sprite.x < 0:
         erebus_sprite.x = 0
     elif erebus_sprite.x > display.width - tile_width:
@@ -84,8 +115,10 @@ while True:
 
     erebus_sprite.x = erebus_sprite.x
     
+    #wrap around the top
     if erebus_sprite.y < 0:
         erebus_sprite.y = display.height - tile_height
+        score += score_increment #temporary
     
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
