@@ -9,7 +9,7 @@ display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
 
-space_station_background = displayio.OnDiskBitmap("spacestationbackground_old.bmp")
+space_station_background = displayio.OnDiskBitmap("spacestationbackground.bmp")
 
 bg_sprite = displayio.TileGrid(
 	space_station_background, 
@@ -31,15 +31,14 @@ erebus_sprite = displayio.TileGrid(
     tile_width=tile_width,
     tile_height=tile_height,
 	default_tile=0,
-	x=(display.width - tile_width) // 2,
-	y=display.height - tile_height - 10
+	x=(display.width - tile_width) // 3,
+	y=display.height - tile_height - 1
 )
 
 splash.append(erebus_sprite)
 
 frame = 0
-
-keys = pygame.key.get_pressed()
+speed = 32
 
 while True:
     for event in pygame.event.get():
@@ -50,6 +49,12 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
+            elif event.key == pygame.K_LEFT:
+                erebus_sprite.x -= speed
+            elif event.key == pygame.K_RIGHT:
+                erebus_sprite.x += speed
+            elif event.key == pygame.K_UP:
+                erebus_sprite.y -= speed
     
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
