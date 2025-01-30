@@ -210,4 +210,4 @@ while True:
             screen = 1
             draw_elements()
 
-    time.sleep(0.1)
+    time.sleep(0.07)
