@@ -90,7 +90,9 @@ credits = displayio.TileGrid(credits_bitmap, pixel_shader=credits_bitmap.pixel_s
 
 screen = 0
 
+# Screen definitions
 def draw_elements():
+    # Removes all existing elements from splash
     for i in range(len(splash)-1, -1, -1):
         del splash[i]
     if screen == 0:
@@ -130,7 +132,7 @@ while True:
             exit()
 
     keys = pygame.key.get_pressed()
-    if screen == 0:
+    if screen == 0: # Game screen
         if keys[pygame.K_LEFT] and paddle.x > 16:
             paddle.x -= move_speed
         if keys[pygame.K_RIGHT] and paddle.x < 80:
@@ -174,7 +176,7 @@ while True:
             else:
                 splash.append(prompt)
                 game_over = True
-    elif screen == 1:
+    elif screen == 1: # Settings screen
         if not adjusting:
             if keys[pygame.K_RIGHT] and cursor_pos < 2:
                 cursor_pos += 1
@@ -203,7 +205,7 @@ while True:
             barfiller.x = -89 + (speed_seting * 15)
 
         menucursor.y = button_positions[cursor_pos]
-    elif screen == 2:
+    elif screen == 2: # Credits screen
         if keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]:
             screen = 1
             draw_elements()
