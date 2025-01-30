@@ -15,6 +15,10 @@ You have to do a couple things to keep the station afloat
 - Keep the [TEG](https://wiki.spacestation14.com/wiki/Power#The_Thermoelectric_Generator_(TEG)) running, though even I have no idea how to do that!
 - Get screamed at by the crew! It's part of the job!
 
+# How do you play?
+
+You might have noticed that you can not go down, only up, left and right, well, when you reach the top, you automatically loop to the bottom, each time this happens, you progress the game, each time you proverbialy "pass go" (going to a new "round") there will appear a random warning, maybe some tider opened the doors, maybe someone cut the singulo wire, maybe the TEG is acting up, you will have to fix these as fast as possible or risk losing points! you will also have to eat, each round your hunger goes up and you have to eat, being the funny moth person that you are, you eat cloth, each time you iteract with the food dispenser it will cost you 10 score, run out of score, and the game is over! Oh and please, don't foget to have fun, in [spess](https://www.reddit.com/r/SS13/comments/ecw3se/spessman_alignment_chart/)!
+
 ## WIP
 
 The game **_isn't finished yet_** and probably won't be completed by the deadline but I'll keep updating it even after the deadline!
