@@ -68,7 +68,7 @@ erebus_sprite = displayio.TileGrid(
     tile_height=tile_height,
 	default_tile=0,
 	x=(display.width - tile_width) // 3,
-	y=display.height - tile_height - 1
+	y=display.height - tile_height - 0
 )
 
 splash.append(erebus_sprite)
@@ -78,7 +78,7 @@ score = 10
 score_increment = 10
 round = 0
 hunger = 40
-hunger_increment = 30
+hunger_increment = 20
 hunger_round_increment = 10
 ate = False
 warning = False
@@ -115,19 +115,19 @@ while True:
                 exit()
             elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 erebus_sprite.x -= speed
-                ate = False
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
+                print ("Hunger: ", hunger)
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 erebus_sprite.x += speed
-                ate = False
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
+                print ("Hunger: ", hunger)
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
                 erebus_sprite.y -= speed
-                ate = False
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
+                print ("Hunger: ", hunger)
 
     #wrap around the sides
     if erebus_sprite.x < 0:
@@ -148,13 +148,14 @@ while True:
         print ("Score: ", score)
         print ("Hunger: ", hunger)
 
-    if erebus_sprite.x == 96 and erebus_sprite.y == 63 and hunger >= 1:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False:
         hunger -= hunger_increment
         print ("Hunger: ", hunger)
+        ate = True
 
-    if hunger <= 0:
-        hunger = 0
-        print ("Hunger: ", hunger)
+    #if hunger <= 0:
+        #hunger = 0
+        #print ("Hunger: ", hunger)
 
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
