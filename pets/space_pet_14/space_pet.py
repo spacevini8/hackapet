@@ -35,16 +35,24 @@ door_1_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
-door_2 = displayio.OnDiskBitmap("door_2.bmp")
+door_2_sprite = displayio.OnDiskBitmap("door_2.bmp")
 
 door_2_sprite = displayio.TileGrid(
-	door_2, 
+	door_2_sprite, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+food_dispenser = displayio.OnDiskBitmap("food_dispenser.bmp")
+
+food_dispenser_sprite = displayio.TileGrid(
+	food_dispenser, 
 	pixel_shader=space_station_background.pixel_shader
 )
 
 splash.append(bg_sprite)
 splash.append(door_1_sprite)
 splash.append(door_2_sprite)
+splash.append(food_dispenser_sprite)
 
 erebus_sheet = displayio.OnDiskBitmap("erebus_sheet.bmp")
 
@@ -68,6 +76,11 @@ splash.append(erebus_sprite)
 #here be warnings
 score = 10
 score_increment = 10
+round = 0
+hunger = 40
+hunger_increment = 30
+hunger_round_increment = 10
+ate = False
 warning = False
 warning_door_1 = False
 warning_door_2 = False
@@ -102,11 +115,20 @@ while True:
                 exit()
             elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 erebus_sprite.x -= speed
+                ate = False
+                print ("x:", erebus_sprite.x)
+                print ("y:", erebus_sprite.y)
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 erebus_sprite.x += speed
+                ate = False
+                print ("x:", erebus_sprite.x)
+                print ("y:", erebus_sprite.y)
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
                 erebus_sprite.y -= speed
-    
+                ate = False
+                print ("x:", erebus_sprite.x)
+                print ("y:", erebus_sprite.y)
+
     #wrap around the sides
     if erebus_sprite.x < 0:
         erebus_sprite.x = 0
@@ -119,7 +141,21 @@ while True:
     if erebus_sprite.y < 0:
         erebus_sprite.y = display.height - tile_height
         score += score_increment #temporary
-    
+        round += 1
+        hunger += hunger_round_increment
+        ate = False
+        print ("Round: ", round)
+        print ("Score: ", score)
+        print ("Hunger: ", hunger)
+
+    if erebus_sprite.x == 96 and erebus_sprite.y == 63 and hunger >= 1:
+        hunger -= hunger_increment
+        print ("Hunger: ", hunger)
+
+    if hunger <= 0:
+        hunger = 0
+        print ("Hunger: ", hunger)
+
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
 
