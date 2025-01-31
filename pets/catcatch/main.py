@@ -12,7 +12,6 @@ speaker_volume = 0.2
 
 pygame.mixer.music.load("badapple.wav")
 pygame.mixer.music.set_volume(speaker_volume)
-pygame.mixer.music.play()
 
 
 # this is bad
@@ -116,9 +115,13 @@ score = 0
 start_time = time.time()
 game_time = 0
 
+start = displayio.OnDiskBitmap("start.bmp")
+
 win = displayio.OnDiskBitmap("win.bmp")
 
 displayed_score = False
+
+font = bitmap_font.load_font("./helvR12.bdf")
 
 
 def finished(score):
@@ -133,7 +136,6 @@ def finished(score):
     splash.append(
         winscreen,
     )
-    font = bitmap_font.load_font("./helvR12.bdf")
     text_area = label.Label(
         font,
         text=f"Missed: {217 - score}",
@@ -143,6 +145,24 @@ def finished(score):
     )
     splash.append(text_area)
     displayed_score = True
+
+
+startscreen = displayio.TileGrid(
+    start,
+    pixel_shader=start.pixel_shader,
+)
+splash.append(
+    startscreen,
+)
+
+text_area = label.Label(
+    font,
+    text="",
+    color=0xFFFFFF,
+    x=(10),
+    y=(display.height - 12),
+)
+splash.append(text_area)
 
 
 while True:
@@ -155,15 +175,18 @@ while True:
 
     keys = pygame.key.get_pressed()
 
-    if not game_over:
+    if not started and keys[pygame.K_x]:
+        splash.remove(startscreen)
+        pygame.mixer.music.play()
+        started = True
+
+    if not game_over and started:
         if game_time > 217:
             game_over = True
-        if keys[pygame.K_z]:
-            if cat_sprite.x - speed >= 0:
-                cat_sprite.x -= speed
-        if keys[pygame.K_c]:
-            if cat_sprite.x + speed <= (128 - tile_width):
-                cat_sprite.x += speed
+        if keys[pygame.K_z] and cat_sprite.x - speed >= 0:
+            cat_sprite.x -= speed
+        if keys[pygame.K_c] and cat_sprite.x + speed <= (128 - tile_width):
+            cat_sprite.x += speed
         if keys[pygame.K_x]:
             speed = 16
         else:
@@ -174,7 +197,7 @@ while True:
             if lane != -1:
                 spawnfruit(lane)
                 spawn_events[game_time] = -1
-    else:
+    elif game_over and started:
         finished(score)
 
     for fruit in fruits:
@@ -186,6 +209,7 @@ while True:
             splash.remove(fruit)
             fruits.remove(fruit)
             score += 1
+            text_area.text = f"Score: {score}"
 
     cat_sprite[0] = frame
     frame = (frame + 1) % (cat_sheet.width // tile_width)

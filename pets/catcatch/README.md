@@ -4,6 +4,8 @@ Catch the burgers to the beat!
 
 ## How to play
 
+Press X to start.
+
 Z - Left\
 X - Sprint\
 C - Right
