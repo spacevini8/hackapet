@@ -169,9 +169,8 @@ while True:
         else:
             speed = 8
 
-        if game_time in spawn_events:
+        if game_time < len(spawn_events):
             lane = spawn_events[game_time]
-            # if it's not out of bounds we spawn a fruit
             if lane != -1:
                 spawnfruit(lane)
                 spawn_events[game_time] = -1
