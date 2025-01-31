@@ -8,7 +8,7 @@ from adafruit_display_shapes.rect import Rect
 import random
 from potato import Potato
 from potato import growthStage
-from fontio import BuiltinFont
+
 
 waterIncrese = 1
 foodIncrese = 1
@@ -22,7 +22,7 @@ bugIncrese = 1
 chanceOfDecrese = 1000
 chanceOfBug = 500
 chanceOfDamg = 700
-chanceOfGrowth = 1100
+chanceOfGrowth = 100
 
 def updateBar(splash, bar, maxBar, thing, maxThing, color):
     if bar:
@@ -45,6 +45,7 @@ bgrSprite = displayio.TileGrid(bgrImage,pixel_shader=bgrImage.pixel_shader)
 
 font = bitmap_font.load_font("helvR12.bdf")
 gameOverText = label.Label(font, text="Your Potato Died!")
+winText = label.Label(font, text="Congrats! Your\npotato is fully\ngrown and\nready to be\nbaked, mashed,\nboiled, or fryed!", x=5,y=5,scale=1,line_spacing=0.7,color=0x0)
 
 splash.append(bgrSprite)
 
@@ -80,7 +81,7 @@ splash.append(potatoSprite)
 frame = 0
 
 #Dormant, Sprout, Plant, Flowers
-growthStages = [growthStage(potatoImage, 3), growthStage(potatoImage, 5), growthStage(potatoImage, 10), growthStage(potatoImage, 10)]
+growthStages = [growthStage(None, 3), growthStage(None, 5), growthStage(None, 10), growthStage(None, 10)]
 
 spud = Potato(10,10,10,10,growthStages)
 
@@ -151,8 +152,8 @@ while True:
                 spud.bugs = spud.maxBugs
             print(f"bugs:{spud.bugs}")
     
-    if spud.water < (spud.maxWater*0.25) or spud.food < (spud.maxFood):
-        if spud.water < (spud.maxWater*0.25) and spud.food < (spud.maxFood):
+    if spud.water < (spud.maxWater*0.25) or spud.food < (spud.maxFood*0.25):
+        if spud.water < (spud.maxWater*0.25) and spud.food < (spud.maxFood*0.25):
             tmpChanceOfDamg = chanceOfDamg/2
         else:
             tmpChanceOfDamg = chanceOfDamg
@@ -175,14 +176,22 @@ while True:
         splash.append(deadPotatoSprite)
         
         splash.append(gameOverText)
+        continue
     
     if spud.health > (spud.maxHealth*0.5):
-        spud.stageProg += 1
-        if spud.stageProg >= spud.growthStages[spud.curentStage].length:
-            spud.curentStage += 1
-            spud.stageProg = 0
-            #TODO: add win check
-            potatoSprite.bitmap = spud.growthStages[spud.curentStage].image
+        if random.randint(0,chanceOfGrowth) == 0:
+
+            spud.stageProg += 1
+            if spud.stageProg >= spud.growthStages[spud.curentStage].length:
+                spud.curentStage += 1
+                spud.stageProg = 0
+                if spud.curentStage >= len(spud.growthStages):
+                    spud.alive = False
+
+                    splash.append(winText)
+                    continue
+                if spud.growthStages[spud.curentStage].image:
+                    splash.append(spud.growthStages[spud.curentStage].image)
 
             
 

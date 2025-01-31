@@ -1,7 +1,7 @@
 class growthStage:
     def __init__(self, image, length):
-        image = image
-        length = length
+        self.image = image
+        self.length = length
 
 class Potato:
     def __init__(self, maxWater, maxFood, maxBugs, maxHealth, growthStages):
