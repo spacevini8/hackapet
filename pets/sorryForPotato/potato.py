@@ -9,3 +9,5 @@ class Potato:
         self.food = self.maxFood//4
         self.bugs = 0
         self.health = maxHealth
+
+        self.alive = True

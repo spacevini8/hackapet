@@ -7,6 +7,7 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import random
 from potato import Potato
+from fontio import BuiltinFont
 
 waterIncrese = 1
 foodIncrese = 1
@@ -40,14 +41,29 @@ display.show(splash)
 bgrImage = displayio.OnDiskBitmap("background.bmp")
 bgrSprite = displayio.TileGrid(bgrImage,pixel_shader=bgrImage.pixel_shader)
 
+font = bitmap_font.load_font("helvR12.bdf")
+gameOverText = label.Label(font, text="Your Potato Died!")
+
 splash.append(bgrSprite)
 
 tile_width=32
 tile_height=32
 potatoImage = displayio.OnDiskBitmap("Potato.bmp")
+deadPotatoImage = displayio.OnDiskBitmap("PotatoDead2.bmp")
 potatoSprite = displayio.TileGrid(
     potatoImage,
     pixel_shader=potatoImage.pixel_shader,
+    width=1,
+	height=1,
+	tile_width=32,
+	tile_height=32,
+	default_tile=0,
+	x=(display.width - tile_width) // 2,
+	y=display.height - tile_height - 10
+)
+deadPotatoSprite = displayio.TileGrid(
+    deadPotatoImage,
+    pixel_shader=deadPotatoImage.pixel_shader,
     width=1,
 	height=1,
 	tile_width=32,
@@ -83,22 +99,26 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_1:
-                spud.water+= waterIncrese
-                if spud.water > spud.maxWater:
-                    spud.water = spud.maxWater
-                print(spud.water)
-            if event.key == pygame.K_2:
-                spud.food += foodIncrese
-                if spud.food > spud.maxFood:
-                    spud.food = spud.maxFood
-                print(spud.food)
-            if event.key == pygame.K_3:
-                spud.bugs -= bugDecrese
-                if spud.bugs < 0:
-                    spud.bugs = 0
-                print(spud.bugs)
+
+        if spud.alive == True:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    spud.water+= waterIncrese
+                    if spud.water > spud.maxWater:
+                        spud.water = spud.maxWater
+                    print(spud.water)
+                if event.key == pygame.K_2:
+                    spud.food += foodIncrese
+                    if spud.food > spud.maxFood:
+                        spud.food = spud.maxFood
+                    print(spud.food)
+                if event.key == pygame.K_3:
+                    spud.bugs -= bugDecrese
+                    if spud.bugs < 0:
+                        spud.bugs = 0
+                    print(spud.bugs)
+    if spud.alive == False:
+        continue
     
     #decrese water and food
     randNum = random.randint(0, chanceOfDecrese)
@@ -141,6 +161,14 @@ while True:
         if random.randint(0, chanceOfDamg) == 0:
             spud.health -= 1
         #TODO: potato image should get sadder as health drops
+
+    if spud.health < 0:
+        spud.alive = False
+        
+        splash.remove(potatoSprite)
+        splash.append(deadPotatoSprite)
+        
+        splash.append(gameOverText)
 
             
 
