@@ -49,10 +49,18 @@ food_dispenser_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+AME_normal = displayio.OnDiskBitmap("AME_normal.bmp")
+
+AME_sprite = displayio.TileGrid(
+	AME_normal, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
 splash.append(bg_sprite)
 splash.append(door_1_sprite)
 splash.append(door_2_sprite)
 splash.append(food_dispenser_sprite)
+splash.append(AME_sprite)
 
 erebus_sheet = displayio.OnDiskBitmap("erebus_sheet.bmp")
 
@@ -73,13 +81,33 @@ erebus_sprite = displayio.TileGrid(
 
 splash.append(erebus_sprite)
 
+#food
+#x = 96
+#y = 64
+#door_1
+#x = 96
+#Y = 96
+#door_2
+#x = 0
+#Y = 96
+#AME
+#x = 0
+#Y = 64
+#Singulo
+#x = 0
+#Y = 32
+#TEG
+#x = 96
+#Y = 32
+
 #here be warnings
 score = 10
 score_increment = 10
 round = 0
-hunger = 40
+hunger = 10
 hunger_increment = 20
 hunger_round_increment = 10
+hunger_reset = False #ignore this, I am dum
 ate = False
 warning = False
 warning_door_1 = False
@@ -148,14 +176,21 @@ while True:
         print ("Score: ", score)
         print ("Hunger: ", hunger)
 
-    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 20:
         hunger -= hunger_increment
         print ("Hunger: ", hunger)
         ate = True
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 20:
+        hunger = 0
+        print ("Hunger: ", hunger)
+        ate = True
 
-    #if hunger <= 0:
+    #I HAVE NO IDEA WHAT I'M DOING! :D
+
+    #if hunger <= 0 and hunger_reset == False:
         #hunger = 0
         #print ("Hunger: ", hunger)
+        #hunger_reset = True
 
     erebus_sprite[0] = frame
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
