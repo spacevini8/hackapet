@@ -101,8 +101,11 @@ splash.append(erebus_sprite)
 #Y = 32
 
 #here be warnings
+game_over = False
 score = 10
 score_increment = 10
+food_price = 6
+food_reduced_price = 3
 round = 0
 hunger = 10
 hunger_increment = 20
@@ -178,12 +181,22 @@ while True:
 
     if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 20:
         hunger -= hunger_increment
+        score -= food_price
         print ("Hunger: ", hunger)
+        print ("Score: ", score)
         ate = True
     if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 20:
         hunger = 0
+        score -= food_reduced_price
         print ("Hunger: ", hunger)
+        print ("Score: ", score)
         ate = True
+
+    if score <= 0:
+        game_over = True
+        print ("Game Over")
+        pygame.quit()
+        exit()
 
     #I HAVE NO IDEA WHAT I'M DOING! :D
 
