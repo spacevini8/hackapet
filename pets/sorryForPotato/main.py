@@ -7,6 +7,7 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import random
 from potato import Potato
+from potato import growthStage
 from fontio import BuiltinFont
 
 waterIncrese = 1
@@ -21,6 +22,7 @@ bugIncrese = 1
 chanceOfDecrese = 1000
 chanceOfBug = 500
 chanceOfDamg = 700
+chanceOfGrowth = 1100
 
 def updateBar(splash, bar, maxBar, thing, maxThing, color):
     if bar:
@@ -77,7 +79,11 @@ splash.append(potatoSprite)
 
 frame = 0
 
-spud = Potato(10,10,10,10)
+#Dormant, Sprout, Plant, Flowers
+growthStages = [growthStage(potatoImage, 3), growthStage(potatoImage, 5), growthStage(potatoImage, 10), growthStage(potatoImage, 10)]
+
+spud = Potato(10,10,10,10,growthStages)
+
 
 
 waterOutline = Rect(10,10,32,4,outline=0xFFFFFF)
@@ -169,6 +175,14 @@ while True:
         splash.append(deadPotatoSprite)
         
         splash.append(gameOverText)
+    
+    if spud.health > (spud.maxHealth*0.5):
+        spud.stageProg += 1
+        if spud.stageProg >= spud.growthStages[spud.curentStage].length:
+            spud.curentStage += 1
+            spud.stageProg = 0
+            #TODO: add win check
+            potatoSprite.bitmap = spud.growthStages[spud.curentStage].image
 
             
 

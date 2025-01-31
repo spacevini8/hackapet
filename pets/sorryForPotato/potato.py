@@ -1,5 +1,10 @@
+class growthStage:
+    def __init__(self, image, length):
+        image = image
+        length = length
+
 class Potato:
-    def __init__(self, maxWater, maxFood, maxBugs, maxHealth):
+    def __init__(self, maxWater, maxFood, maxBugs, maxHealth, growthStages):
         self.maxWater = maxWater
         self.maxFood = maxFood
         self.maxBugs = maxBugs
@@ -10,4 +15,10 @@ class Potato:
         self.bugs = 0
         self.health = maxHealth
 
+        self.growthStages = growthStages
+        self.curentStage = 0
+        self.stageProg = 0
+
         self.alive = True
+
+
