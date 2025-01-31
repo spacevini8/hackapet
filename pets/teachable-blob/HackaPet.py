@@ -14,7 +14,7 @@ pygame.display.set_caption("Hackapet")
 
 
 def load_image(file_path, scale, pos_x, pos_y, w, h, idx):
-    image_path = os.path.join(os.path.dirname(__file__), file_path)
+    image_path = os.path.join(os.path.dirname(__file__), "art",file_path)
     image = pygame.image.load(image_path).convert_alpha()
     img_w, img_h = image.get_size()
     width = scale*w
@@ -26,7 +26,7 @@ def load_image(file_path, scale, pos_x, pos_y, w, h, idx):
 
 
 def setup_background():
-    background = os.path.join(os.path.dirname(__file__), "background.bmp")
+    background = os.path.join(os.path.dirname(__file__), "art", "background.bmp")
     image = pygame.image.load(background)
     screen.blit(image, (0, 0))
 
