@@ -6,16 +6,16 @@ import time
 import pygame
 import random
 
-# Initialize display
-display = PyGameDisplay(width=128, height=128)
+WIDTH = 128
+HEIGHT = 128
+
+display = PyGameDisplay(width=WIDTH, height=HEIGHT)
 splash = displayio.Group()
 
-# Load and apply background
 background = displayio.OnDiskBitmap("assets/background.bmp")
 bg_tile = displayio.TileGrid(background, pixel_shader=displayio.ColorConverter())
 splash.append(bg_tile)
 
-# Load Fox animation
 fox_sprites = displayio.OnDiskBitmap("assets/glitch_fox_idle.bmp")
 frame_width = 64
 frame_height = 64
@@ -27,67 +27,139 @@ fox = displayio.TileGrid(
     tile_width=frame_width,
     tile_height=frame_height,
     x=32,
-    y=128 - frame_height,  # Ensures fox stays in frame
+    y=HEIGHT - frame_height,
 )
 splash.append(fox)
 
-# Load the custom font
-font = bitmap_font.load_font("assets/Dina_r400-10.bdf")
+font = bitmap_font.load_font("assets/Dina_i400-8.bdf")
 
-# Level Display
-level_label = label.Label(
-    font, text="Level: 1", color=0xFFFFFF, x=5, y=5
-)
+level_label = label.Label(font, text="Level: 1", color=0xFFFFFF, x=5, y=5)
 splash.append(level_label)
 
-# Bytes (Food) Display
-bytes_label = label.Label(
-    font, text="Bytes: 0/3", color=0xFFFFFF, x=5, y=20
-)
+bytes_label = label.Label(font, text="Bytes: 0/3", color=0xFFFFFF, x=5, y=20)
 splash.append(bytes_label)
 
-# Feedback Message Display
-feedback_label = label.Label(
-    font, text="", color=0xFFFF00, x=5, y=35
-)
+feedback_label = label.Label(font, text="", color=0xFFFF00, x=5, y=35)
 splash.append(feedback_label)
 
-# Initial Byte Settings
-byte_size = 16
-byte_speed = 1
-fox_x = 32
-fox_speed = 8
-byte_y = 0
-current_frame = 0
-animation_speed = 0.05
-feedback_timer = 0
-current_level = 1
-bytes_collected = 0
-bytes_required = 3
+health_label = label.Label(font, text="Health: 3", color=0xFFFFFF, x=5, y=50)
+splash.append(health_label)
 
-# Generate Byte (Food)
+display.show(splash)
+
+def reset_game():
+    """Reset all game variables to their initial values."""
+    global current_level, bytes_collected, bytes_required
+    global byte_speed, fox_speed, byte_size, health
+    global fox_x, byte_y, current_frame, feedback_timer
+
+    current_level = 1
+    bytes_collected = 0
+    bytes_required = 3
+    byte_speed = 1
+    fox_speed = 8
+    byte_size = 16
+    fox_x = 32
+    fox.x = fox_x
+    byte_y = 0
+    current_frame = 0
+    feedback_timer = 0
+    health = 3
+
 def generate_byte():
     global byte_size
     byte = displayio.Bitmap(byte_size, byte_size, 2)
     byte_palette = displayio.Palette(2)
     byte_palette[0] = 0x000000
-    byte_palette[1] = 0xFFFF00  # Yellow
-    byte_item = displayio.TileGrid(byte, pixel_shader=byte_palette, x=random.randint(0, 128 - byte_size), y=0)
-
+    byte_palette[1] = 0xFFFF00
+    byte_item = displayio.TileGrid(
+        byte,
+        pixel_shader=byte_palette,
+        x=random.randint(0, WIDTH - byte_size),
+        y=0
+    )
     for x in range(byte_size):
         for y in range(byte_size):
             byte[x, y] = 1
-
     return byte_item
 
-# First byte
+def show_title_screen():
+    """Display a title screen with a 'Press any key to start' prompt."""
+    title_splash = displayio.Group()
+    bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
+    bg_palette = displayio.Palette(1)
+    bg_palette[0] = 0x000000
+    bg_tile = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
+    title_splash.append(bg_tile)
+    title_label = label.Label(
+        font,
+        text="GLITCH FOX",
+        color=0xFF00FF,
+        x=WIDTH // 2 - 40,
+        y=HEIGHT // 2 - 10
+    )
+    title_splash.append(title_label)
+    prompt_label = label.Label(
+        font,
+        text="Press any key",
+        color=0xFFFFFF,
+        x=WIDTH // 2 - 60,
+        y=HEIGHT // 2 + 10
+    )
+    title_splash.append(prompt_label)
+    display.show(title_splash)
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                waiting = False
+    display.show(splash)
+
+def show_death_screen():
+    """Display a 'Game Over' screen until any key is pressed."""
+    death_splash = displayio.Group()
+    bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
+    bg_palette = displayio.Palette(1)
+    bg_palette[0] = 0x000000
+    bg_tile = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
+    death_splash.append(bg_tile)
+    game_over_label = label.Label(
+        font,
+        text="GAME OVER",
+        color=0xFF0000,
+        x=WIDTH // 2 - 30,
+        y=HEIGHT // 2 - 10
+    )
+    death_splash.append(game_over_label)
+    prompt_label = label.Label(
+        font,
+        text="Press any key.",
+        color=0xFFFFFF,
+        x=WIDTH // 2 - 60,
+        y=HEIGHT // 2 + 10
+    )
+    death_splash.append(prompt_label)
+    display.show(death_splash)
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                waiting = False
+    display.show(splash)
+
+animation_speed = 0.05
+running = True
+show_title_screen()
+reset_game()
 byte_item = generate_byte()
 splash.append(byte_item)
 
-display.show(splash)
-
-# Game Loop
-running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -95,65 +167,58 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 fox_x = max(0, fox_x - fox_speed)
+                fox.flip_x = False
             elif event.key == pygame.K_RIGHT:
-                fox_x = min(128 - frame_width, fox_x + fox_speed)
-
+                fox_x = min(WIDTH - frame_width, fox_x + fox_speed)
+                fox.flip_x = True
     fox.x = fox_x
-
-    # Move Byte
     byte_y += byte_speed
     byte_item.y = int(byte_y)
-
-    # Check Collision with Fox
-    if byte_y >= 128 - frame_height and fox_x <= byte_item.x <= fox_x + frame_width:
+    if (byte_y >= HEIGHT - frame_height) and (fox_x <= byte_item.x <= fox_x + frame_width):
         bytes_collected += 1
         feedback_label.text = "You caught a byte!"
         feedback_timer = 20
-
-        # Reset byte
         splash.remove(byte_item)
         byte_y = 0
         byte_item = generate_byte()
         splash.append(byte_item)
-
-        # Check Level Up
         if bytes_collected >= bytes_required:
             current_level += 1
             bytes_collected = 0
-            bytes_required += 2  # Increase bytes needed for next level
-
-            byte_speed += 1  # Make bytes fall faster
-            fox_speed = min(16, fox_speed + 2)  # Increase fox movement speed
-            byte_size = max(4, byte_size - 2)  # Make bytes smaller
-
-            splash.remove(byte_item)  # Clear previous bytes
+            bytes_required += 2
+            byte_speed += 1
+            fox_speed = min(16, fox_speed + 2)
+            byte_size = max(4, byte_size - 2)
+            health = min(3, health + 1)
+            splash.remove(byte_item)
             byte_item = generate_byte()
             splash.append(byte_item)
-
             feedback_label.text = f"Level {current_level}!"
-
-    elif byte_y > 128:
-        feedback_label.text = "You missed a byte!"
+    elif byte_y > HEIGHT:
+        health -= 1
+        feedback_label.text = "You missed a byte."
         feedback_timer = 20
         splash.remove(byte_item)
         byte_y = 0
         byte_item = generate_byte()
         splash.append(byte_item)
-
-    # Update text
+    if health <= 0:
+        show_death_screen()
+        reset_game()
+        splash.remove(byte_item)
+        byte_item = generate_byte()
+        splash.append(byte_item)
+        feedback_label.text = ""
+        continue
     level_label.text = f"Level: {current_level}"
     bytes_label.text = f"Bytes: {bytes_collected}/{bytes_required}"
-
-    # Remove feedback after time
-    if feedback_timer > 0:
+    health_label.text = f"Health: {health}"
+    if 'feedback_timer' in globals() and feedback_timer > 0:
         feedback_timer -= 1
     else:
         feedback_label.text = ""
-
-    # Handle Animation
     current_frame = (current_frame + 1) % total_frames
     fox[0] = current_frame
-
     time.sleep(animation_speed)
 
 pygame.quit()
