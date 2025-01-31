@@ -31,3 +31,6 @@ Your health will decrease without water until you eventually die.
 
 [![Demo Video](https://cloud-cyzv9gb2b-hack-club-bot.vercel.app/0screenshot_2025-01-31_at_10.54.56___am.png)](https://cloud-2zovn75op-hack-club-bot.vercel.app/0screen_recording_2025-01-31_at_3.20.51___pm.mp4)
 
+
+@esemv on Slack
+
