@@ -267,8 +267,13 @@ while True:
         # this needs to be randomised!
         if warning_door_1 == False:
             warning_door_1 = True # REMOVE THIS LATER!!!
+            score_round_increment -= score_penalty
         if warning_door_2 == False:
             warning_door_2 = True # REMOVE THIS LATER!!!
+            score_round_increment -= score_penalty
+        if warning_AME == False:
+            warning_AME = True # REMOVE THIS LATER!!!
+            score_round_increment -= score_penalty
 
     # food
     # btw, that's not rice, 
@@ -296,9 +301,9 @@ while True:
         splash.append(warning_door_1_sprite)
         if door_1_sprite in splash:
             splash.remove(door_1_sprite)
-        if penalty_door_1 == False:
-            score_round_increment -= score_penalty
-            penalty_door_1 = True
+        #if penalty_door_1 == False:
+            #score_round_increment -= score_penalty
+            #penalty_door_1 = True
     else:
         if warning_door_1_sprite in splash:
             splash.remove(warning_door_1_sprite)
@@ -331,9 +336,9 @@ while True:
         splash.append(warning_door_2_sprite)
         if door_2_sprite in splash:
             splash.remove(door_2_sprite)
-        if penalty_door_2 == False:
-            score_round_increment -= score_penalty
-            penalty_door_2 = True
+        #if penalty_door_2 == False:
+            #score_round_increment -= score_penalty
+            #penalty_door_2 = True
     else:
         if warning_door_2_sprite in splash:
             splash.remove(warning_door_2_sprite)
