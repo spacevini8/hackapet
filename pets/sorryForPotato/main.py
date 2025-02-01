@@ -37,7 +37,8 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
 
 pygame.init()
 scale = 1
-display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+#display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+display=PyGameDisplay(width=128*scale, height=128*scale)
 splash = displayio.Group(scale=scale)
 
 display.show(splash)
