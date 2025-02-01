@@ -134,8 +134,8 @@ score_increment = 20
 score_round_increment = 50
 score_penalty = 30
 score_overflow_reset_completed = False
-food_price = 6
-food_reduced_price = 3
+food_price = 15
+food_reduced_price = 10
 round = 0
 hunger = 10
 hunger_increment = 20
@@ -155,6 +155,12 @@ speed = 32
 
 score_label = label.Label(font, text=f"Score: {score}", color=0xFFFFFF, x=32, y=10)
 splash.append(score_label)
+
+hunger_label = label.Label(font, text=f"Hunger: {hunger}", color=0xFFFFFF, x=30, y=32)
+splash.append(hunger_label)
+
+round_score_label = label.Label(font, text=f"rnd: {score_round_increment}", color=0xFFFFFF, x=40, y=54)
+splash.append(round_score_label)
 
 while True:
     for event in pygame.event.get():
@@ -300,6 +306,12 @@ while True:
         score_overflow_reset_completed = True
 
     score_label.text = f"Score: {score}"
+    display.refresh()
+
+    hunger_label.text = f"Hunger: {hunger}"
+    display.refresh()
+
+    round_score_label.text = f"rnd: {score_round_increment}"
     display.refresh()
 
     # score overflow reset
