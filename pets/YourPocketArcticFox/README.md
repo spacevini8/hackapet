@@ -18,4 +18,3 @@ Work in progress (maybe, if people like this enough I might add more features an
 are always happily accepted!**
 
 ## DEMOS AND SHOWCASE
-https://github.com/user-attachments/assets/862dda3e-2db9-42db-98d4-97c0eb491f63
