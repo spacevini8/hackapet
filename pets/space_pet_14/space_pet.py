@@ -155,20 +155,22 @@ splash.append(erebus_sprite)
 #here be warnings
 game_over = False
 menu_open = False
+write_mode = False
+game_round = 0
 score = 10
 score_increment = 20
 score_round_increment = 50
 score_penalty = 30
 score_overflow_reset_completed = False
-food_price = 15
+food_price = 15#*round(game_round/2)
 food_reduced_price = 10
-round = 0
 hunger = 10
 hunger_increment = 30
 hunger_round_increment = 10
 hunger_cost = 2
 hunger_reset = False #ignore this, I am dum
 ate = False
+warning_select = random.randint(1, 2)
 warning = False
 warning_door_1 = False
 penalty_door_1 = False
@@ -189,8 +191,11 @@ splash.append(score_label)
 hunger_label = label.Label(font, text=f"Hunger: {hunger}", color=0xFFFFFF, x=30, y=32)
 splash.append(hunger_label)
 
-round_score_label = label.Label(font, text=f"rnd: {score_round_increment}", color=0xFFFFFF, x=40, y=54)
+round_score_label = label.Label(font, text=f"income: {score_round_increment}", color=0xFFFFFF, x=32, y=54)
 splash.append(round_score_label)
+
+round_label = label.Label(font, text=f"round: {game_round}", color=0xFFFFFF, x=35, y=74)
+splash.append(round_label)
 
 while True:
     for event in pygame.event.get():
@@ -225,20 +230,21 @@ while True:
                     splash.remove(score_label)
                 game_over = False
                 menu_open = False
+                game_round = 0
                 score = 10
                 score_increment = 20
                 score_round_increment = 50
                 score_penalty = 30
                 score_overflow_reset_completed = False
-                food_price = 15
+                food_price = 15#*round(game_round/2)
                 food_reduced_price = 10
-                round = 0
                 hunger = 10
                 hunger_increment = 30
                 hunger_round_increment = 10
                 hunger_cost = 2
                 hunger_reset = False #ignore this, I am dum
                 ate = False
+                warning_select = random.randint(1, 2)
                 warning = False
                 warning_door_1 = False
                 penalty_door_1 = False
@@ -265,21 +271,28 @@ while True:
     if erebus_sprite.y < 0:
         erebus_sprite.y = display.height - tile_height
         score += score_round_increment
-        round += 1
+        game_round += 1
         hunger += hunger_round_increment
         ate = False
-        print ("Round: ", round)
+        print ("Round: ", game_round)
         print ("Score: ", score)
         print ("Hunger: ", hunger)
-        # this needs to be randomised!
-        if warning_door_1 == False:
-            warning_door_1 = True # REMOVE THIS LATER!!!
+        if write_mode == True:
+            file_object = open(r'score.txt', 'w')
+            file_object.write(f'{str(score)}\n')
+            file_object.close()
+            file_object = open(r'round.txt', 'w')
+            file_object.write(f'{str(game_round)}\n')
+            file_object.close()
+        # this needs to be randomised! done!
+        if warning_door_1 == False and warning_select == random.randint(1, 2):
+            warning_door_1 = True
             #score_round_increment -= score_penalty
-        if warning_door_2 == False:
-            warning_door_2 = True # REMOVE THIS LATER!!!
+        if warning_door_2 == False and warning_select == random.randint(1, 2):
+            warning_door_2 = True
             #score_round_increment -= score_penalty
-        if warning_AME == False:
-            warning_AME = True # REMOVE THIS LATER!!!
+        if warning_AME == False and warning_select == random.randint(1, 2):
+            warning_AME = True
             #score_round_increment -= score_penalty
 
     # food
@@ -433,7 +446,10 @@ while True:
     hunger_label.text = f"Hunger: {hunger}"
     display.refresh()
 
-    round_score_label.text = f"rnd: {score_round_increment}"
+    round_score_label.text = f"income: {score_round_increment}"
+    display.refresh()
+
+    round_label.text = f"round: {game_round}"
     display.refresh()
 
     # score overflow reset (why is this even here? can't be bothered to find where it should be)
