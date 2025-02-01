@@ -12,10 +12,12 @@ HEIGHT = 128
 display = PyGameDisplay(width=WIDTH, height=HEIGHT)
 splash = displayio.Group()
 
+# Main game background.
 background = displayio.OnDiskBitmap("assets/background.bmp")
 bg_tile = displayio.TileGrid(background, pixel_shader=displayio.ColorConverter())
 splash.append(bg_tile)
 
+# Fox sprite.
 fox_sprites = displayio.OnDiskBitmap("assets/glitch_fox_idle.bmp")
 frame_width = 64
 frame_height = 64
@@ -31,6 +33,7 @@ fox = displayio.TileGrid(
 )
 splash.append(fox)
 
+# Load font.
 font = bitmap_font.load_font("assets/Dina_i400-8.bdf")
 
 level_label = label.Label(font, text="Level: 1", color=0xFFFFFF, x=5, y=5)
@@ -86,71 +89,87 @@ def generate_byte():
 def show_title_screen():
     """Display a title screen with a 'Press any key to start' prompt."""
     title_splash = displayio.Group()
-    bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
-    bg_palette = displayio.Palette(1)
-    bg_palette[0] = 0x000000
-    bg_tile = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
-    title_splash.append(bg_tile)
-    title_label = label.Label(
-        font,
-        text="GLITCH FOX",
-        color=0xFF00FF,
-        x=WIDTH // 2 - 40,
-        y=HEIGHT // 2 - 10
+    # Animated title background: a 4-frame (2x2) BMP spritesheet.
+    title_bg = displayio.OnDiskBitmap("assets/title_background.bmp")
+    title_tile = displayio.TileGrid(
+        title_bg,
+        pixel_shader=displayio.ColorConverter(),
+        width=1, height=1,
+        tile_width=WIDTH, tile_height=HEIGHT
     )
+    title_splash.append(title_tile)
+    
+    # Center the title text near the top.
+    title_label = label.Label(font, text="GLITCH FOX", color=0xFF00FF)
+    title_label.anchor_point = (0.5, 0)
+    title_label.anchored_position = (WIDTH // 2, 10)
     title_splash.append(title_label)
-    prompt_label = label.Label(
-        font,
-        text="Press any key",
-        color=0xFFFFFF,
-        x=WIDTH // 2 - 60,
-        y=HEIGHT // 2 + 10
-    )
+    
+    prompt_label = label.Label(font, text="Press any key", color=0xFFFFFF)
+    prompt_label.anchor_point = (0.5, 0)
+    prompt_label.anchored_position = (WIDTH // 2, 30)
     title_splash.append(prompt_label)
+    
     display.show(title_splash)
     waiting = True
+    frame_delay = 0.1  # seconds per frame for title animation
+    last_update = time.monotonic()
+    frame_index = 0
     while waiting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                pygame.quit(); exit()
             elif event.type == pygame.KEYDOWN:
                 waiting = False
+        current_time = time.monotonic()
+        if current_time - last_update > frame_delay:
+            frame_index = (frame_index + 1) % 4  # Cycle through 4 frames
+            title_tile[0] = frame_index
+            last_update = current_time
+        time.sleep(0.01)
     display.show(splash)
 
 def show_death_screen():
-    """Display a 'Game Over' screen until any key is pressed."""
+    """Display a 'Game Over' screen until any key is pressed.
+       Assumes the death background BMP is a horizontal strip of three 128x128 frames."""
     death_splash = displayio.Group()
-    bg_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
-    bg_palette = displayio.Palette(1)
-    bg_palette[0] = 0x000000
-    bg_tile = displayio.TileGrid(bg_bitmap, pixel_shader=bg_palette)
-    death_splash.append(bg_tile)
-    game_over_label = label.Label(
-        font,
-        text="GAME OVER",
-        color=0xFF0000,
-        x=WIDTH // 2 - 30,
-        y=HEIGHT // 2 - 10
+    death_bg = displayio.OnDiskBitmap("assets/death_background.bmp")
+    death_tile = displayio.TileGrid(
+        death_bg,
+        pixel_shader=displayio.ColorConverter(),
+        width=1, height=1,
+        tile_width=WIDTH, tile_height=HEIGHT
     )
+    death_splash.append(death_tile)
+    
+    # Center the death text near the top.
+    game_over_label = label.Label(font, text="GAME OVER", color=0xFF0000)
+    game_over_label.anchor_point = (0.5, 0)
+    game_over_label.anchored_position = (WIDTH // 2, 10)
     death_splash.append(game_over_label)
-    prompt_label = label.Label(
-        font,
-        text="Press any key.",
-        color=0xFFFFFF,
-        x=WIDTH // 2 - 60,
-        y=HEIGHT // 2 + 10
-    )
+    
+    prompt_label = label.Label(font, text="Press any key.", color=0xFFFFFF)
+    prompt_label.anchor_point = (0.5, 0)
+    prompt_label.anchored_position = (WIDTH // 2, 30)
     death_splash.append(prompt_label)
+    
     display.show(death_splash)
     waiting = True
+    frame_delay = 0.3  # seconds per frame for death animation
+    last_update = time.monotonic()
+    frame_index = 0
     while waiting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                pygame.quit(); exit()
             elif event.type == pygame.KEYDOWN:
                 waiting = False
+        current_time = time.monotonic()
+        if current_time - last_update > frame_delay:
+            frame_index = (frame_index + 1) % 3  # Cycle through 3 frames
+            death_tile[0] = frame_index
+            last_update = current_time
+        time.sleep(0.01)
     display.show(splash)
 
 animation_speed = 0.05
