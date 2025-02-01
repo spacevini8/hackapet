@@ -4,6 +4,7 @@ import pygame
 import random
 import time
 from adafruit_display_text import label
+from adafruit_bitmap_font import bitmap_font
 import random
 import sys
 import os
@@ -13,6 +14,8 @@ display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
 pygame.font.init()
+
+font = bitmap_font.load_font("Arial-12.bdf")
 
 programIcon = pygame.image.load('Erebus_Nightflitter.bmp')
 
@@ -150,6 +153,9 @@ warning_TEG = False
 frame = 0
 speed = 32
 
+score_label = label.Label(font, text=f"Score: {score}", color=0xFFFFFF, x=32, y=10)
+splash.append(score_label)
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -179,6 +185,8 @@ while True:
                 print ("Hunger: ", hunger)
             elif event.key == pygame.K_UP and game_over == True:
                 splash.remove(game_over_menu_sprite)
+                if score_label in splash:
+                    splash.remove(score_label)
                 game_over = False
                 menu_open = False
                 score = 10
@@ -290,6 +298,9 @@ while True:
     if score <= 0 and score_overflow_reset_completed == False:
         score = 0
         score_overflow_reset_completed = True
+
+    score_label.text = f"Score: {score}"
+    display.refresh()
 
     # score overflow reset
 
