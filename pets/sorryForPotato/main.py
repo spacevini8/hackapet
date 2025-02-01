@@ -22,6 +22,7 @@ bugIncrese = 1
 chanceOfDecrese = 1000
 chanceOfBug = 500
 chanceOfDamg = 700
+chanceOfHeal = 700
 chanceOfGrowth = 100
 
 def updateBar(splash, bar, maxBar, thing, maxThing, color):
@@ -44,7 +45,7 @@ bgrImage = displayio.OnDiskBitmap("background.bmp")
 bgrSprite = displayio.TileGrid(bgrImage,pixel_shader=bgrImage.pixel_shader)
 
 font = bitmap_font.load_font("helvR12.bdf")
-gameOverText = label.Label(font, text="Your Potato Died!")
+gameOverText = label.Label(font, text="Your Potato Died!",x=5,y=5,scale=1,line_spacing=0.7,color=0x0)
 winText = label.Label(font, text="Congrats! Your\npotato is fully\ngrown and\nready to be\nbaked, mashed,\nboiled, or fryed!", x=5,y=5,scale=1,line_spacing=0.7,color=0x0)
 
 splash.append(bgrSprite)
@@ -90,10 +91,12 @@ spud = Potato(10,10,10,10,growthStages)
 waterOutline = Rect(10,10,32,4,outline=0xFFFFFF)
 foodOutline = Rect(10,16,32,4,outline=0xFFFFFF)
 bugOutline = Rect(10,22,32,4,outline=0xFFFFFF)
+healthOutline = Rect(10,28,32,4,outline=0xFFFFFF)
 
 waterBar = updateBar(splash, None, waterOutline,spud.water,spud.maxWater,0x0000FF)
 foodBar = updateBar(splash, None, foodOutline, spud.food, spud.maxFood, 0xDAA06D)
 bugBar = updateBar(splash, None, bugOutline, spud.bugs, spud.maxBugs, 0xFF0000)
+healthBar = updateBar(splash, None, healthOutline, spud.health, spud.maxHealth, 0x00FF00)
 
 splash.append(waterOutline)
 splash.append(foodOutline)
@@ -101,8 +104,12 @@ splash.append(bugOutline)
 
 while True:
 
-    #This check to see if the X on the window has been pressed. Will be replaced for circitpython
+    
     for event in pygame.event.get():
+
+        #For some reason it often errors when quiting, particerly after
+        #win condition is me. Not to conserend, becuase the program quits either way
+        #but probably should investigate at some point
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
@@ -169,6 +176,12 @@ while True:
             spud.health -= 1
         #TODO: potato image should get sadder as health drops
 
+    if spud.water > (spud.maxWater*0.25) and spud.food > (spud.maxFood*0.25) and spud.bugs == 0:
+        if random.randint(0, chanceOfHeal) == 0:
+            spud.health += 1
+            if spud.health > spud.maxHealth:
+                spud.health = spud.maxHealth 
+
     if spud.health < 0:
         spud.alive = False
         
@@ -201,7 +214,7 @@ while True:
     waterBar = updateBar(splash, waterBar, waterOutline, spud.water, spud.maxWater, 0x0000FF)
     foodBar = updateBar(splash, foodBar,foodOutline,spud.food,spud.maxFood,0xDAA06D)
     bugBar = updateBar(splash, bugBar, bugOutline, spud.bugs, spud.maxBugs, 0xFF0000)
-
+    healthBar = updateBar(splash, healthBar, healthOutline, spud.health, spud.maxHealth, 0x00FF00)
 
     
     
