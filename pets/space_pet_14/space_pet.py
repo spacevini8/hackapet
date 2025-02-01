@@ -76,7 +76,7 @@ AME_sprite = displayio.TileGrid(
 AME_warning = displayio.OnDiskBitmap("AME_warning.bmp")
 
 AME_warning_sprite = displayio.TileGrid(
-	AME_normal, 
+	AME_warning, 
 	pixel_shader=space_station_background.pixel_shader
 )
 
@@ -98,6 +98,13 @@ game_over_menu = displayio.OnDiskBitmap("game_over.bmp")
 
 game_over_menu_sprite = displayio.TileGrid(
 	game_over_menu, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+starvation_menu = displayio.OnDiskBitmap("starvation.bmp")
+
+starvation_menu_sprite = displayio.TileGrid(
+	starvation_menu, 
 	pixel_shader=space_station_background.pixel_shader
 )
 
@@ -267,13 +274,13 @@ while True:
         # this needs to be randomised!
         if warning_door_1 == False:
             warning_door_1 = True # REMOVE THIS LATER!!!
-            score_round_increment -= score_penalty
+            #score_round_increment -= score_penalty
         if warning_door_2 == False:
             warning_door_2 = True # REMOVE THIS LATER!!!
-            score_round_increment -= score_penalty
+            #score_round_increment -= score_penalty
         if warning_AME == False:
             warning_AME = True # REMOVE THIS LATER!!!
-            score_round_increment -= score_penalty
+            #score_round_increment -= score_penalty
 
     # food
     # btw, that's not rice, 
@@ -301,9 +308,9 @@ while True:
         splash.append(warning_door_1_sprite)
         if door_1_sprite in splash:
             splash.remove(door_1_sprite)
-        #if penalty_door_1 == False:
-            #score_round_increment -= score_penalty
-            #penalty_door_1 = True
+        if penalty_door_1 == False:
+            score_round_increment -= score_penalty
+            penalty_door_1 = True
     else:
         if warning_door_1_sprite in splash:
             splash.remove(warning_door_1_sprite)
@@ -327,6 +334,7 @@ while True:
                 splash.append(door_1_sprite)
                 warning_door_1 = False
                 menu_open = False
+                penalty_door_1 = False
                 score += score_increment
                 score_round_increment += score_penalty
 
@@ -336,9 +344,9 @@ while True:
         splash.append(warning_door_2_sprite)
         if door_2_sprite in splash:
             splash.remove(door_2_sprite)
-        #if penalty_door_2 == False:
-            #score_round_increment -= score_penalty
-            #penalty_door_2 = True
+        if penalty_door_2 == False:
+            score_round_increment -= score_penalty
+            penalty_door_2 = True
     else:
         if warning_door_2_sprite in splash:
             splash.remove(warning_door_2_sprite)
@@ -362,6 +370,43 @@ while True:
                 splash.append(door_2_sprite)
                 warning_door_2 = False
                 menu_open = False
+                penalty_door_2 = False
+                score += score_increment
+                score_round_increment += score_penalty
+
+    # AME
+
+    if warning_AME == True:
+        splash.append(AME_warning_sprite)
+        if AME_sprite in splash:
+            splash.remove(AME_sprite)
+        if penalty_AME == False:
+            score_round_increment -= score_penalty
+            penalty_AME = True
+    else:
+        if AME_warning_sprite in splash:
+            splash.remove(AME_warning_sprite)
+        if AME_sprite not in splash:
+            splash.append(AME_sprite)
+        if erebus_sprite in splash:
+            splash.remove(erebus_sprite)
+        if erebus_sprite not in splash:
+            splash.append(erebus_sprite)
+
+    if erebus_sprite.x == 0 and erebus_sprite.y == 64 and warning_AME == True:
+        if menu_open == False:
+            splash.append(AME_control_menu_sprite)
+        menu_open = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if AME_control_menu_sprite in splash:
+                    splash.remove(AME_control_menu_sprite)
+                if AME_warning_sprite in splash:
+                    splash.remove(AME_warning_sprite)
+                splash.append(AME_sprite)
+                warning_AME = False
+                menu_open = False
+                penalty_AME = False
                 score += score_increment
                 score_round_increment += score_penalty
 
@@ -376,6 +421,11 @@ while True:
     if score <= 0 and score_overflow_reset_completed == False:
         score = 0
         score_overflow_reset_completed = True
+
+    if hunger >= 150 and game_over == False:
+        game_over = True
+        print("Game Over")
+        splash.append(starvation_menu_sprite)
 
     score_label.text = f"Score: {score}"
     display.refresh()
