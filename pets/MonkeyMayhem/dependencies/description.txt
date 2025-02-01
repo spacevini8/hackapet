@@ -1,1 +1,1 @@
-this folder contains all the assets used in the game
+this folder contains all the assets required to run the game
