@@ -45,12 +45,17 @@ warning_door_1_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
-door_2_sprite = displayio.OnDiskBitmap("door_2.bmp")
-
-door_2_sprite = displayio.OnDiskBitmap("door_2.bmp")
+door_2 = displayio.OnDiskBitmap("door_2.bmp")
 
 door_2_sprite = displayio.TileGrid(
-	door_2_sprite, 
+	door_2, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+warning_door_2 = displayio.OnDiskBitmap("door_2_open.bmp")
+
+warning_door_2_sprite = displayio.TileGrid(
+	warning_door_2, 
 	pixel_shader=space_station_background.pixel_shader
 )
 
@@ -138,7 +143,7 @@ food_price = 15
 food_reduced_price = 10
 round = 0
 hunger = 10
-hunger_increment = 20
+hunger_increment = 30
 hunger_round_increment = 10
 hunger_cost = 2
 hunger_reset = False #ignore this, I am dum
@@ -147,6 +152,7 @@ warning = False
 warning_door_1 = False
 penalty_door_1 = False
 warning_door_2 = False
+penalty_door_2 = False
 warning_AME = False
 warning_Singulo = False
 warning_TEG = False
@@ -200,8 +206,8 @@ while True:
                 score_round_increment = 50
                 score_penalty = 30
                 score_overflow_reset_completed = False
-                food_price = 6
-                food_reduced_price = 3
+                food_price = 15
+                food_reduced_price = 10
                 round = 0
                 hunger = 10
                 hunger_increment = 20
@@ -213,6 +219,7 @@ while True:
                 warning_door_1 = False
                 penalty_door_1 = False
                 warning_door_2 = False
+                penalty_door_2 = False
                 warning_AME = False
                 warning_Singulo = False
                 warning_TEG = False
@@ -237,8 +244,11 @@ while True:
         print ("Round: ", round)
         print ("Score: ", score)
         print ("Hunger: ", hunger)
+        # this needs to be randomised!
         if warning_door_1 == False:
             warning_door_1 = True # REMOVE THIS LATER!!!
+        if warning_door_2 == False:
+            warning_door_2 = True # REMOVE THIS LATER!!!
 
     # food
     # btw, that's not rice, 
@@ -247,13 +257,13 @@ while True:
     # in this game,
     # and Erebus is a moth
 
-    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 20:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 30:
         hunger -= hunger_increment
         score -= food_price
         print ("Hunger: ", hunger)
         print ("Score: ", score)
         ate = True
-    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 20:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 30:
         hunger = 0
         score -= food_reduced_price
         print ("Hunger: ", hunger)
@@ -280,7 +290,8 @@ while True:
             splash.append(erebus_sprite)
 
     if erebus_sprite.x == 96 and erebus_sprite.y == 96 and warning_door_1 == True:
-        splash.append(door_control_menu_sprite)
+        if menu_open == False:
+            splash.append(door_control_menu_sprite)
         menu_open = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
@@ -294,7 +305,43 @@ while True:
                 score += score_increment
                 score_round_increment += score_penalty
 
+    # door_2
+
+    if warning_door_2 == True:
+        splash.append(warning_door_2_sprite)
+        if door_2_sprite in splash:
+            splash.remove(door_2_sprite)
+        if penalty_door_2 == False:
+            score_round_increment -= score_penalty
+            penalty_door_2 = True
+    else:
+        if warning_door_2_sprite in splash:
+            splash.remove(warning_door_2_sprite)
+        if door_2_sprite not in splash:
+            splash.append(door_2_sprite)
+        if erebus_sprite in splash:
+            splash.remove(erebus_sprite)
+        if erebus_sprite not in splash:
+            splash.append(erebus_sprite)
+
+    if erebus_sprite.x == 0 and erebus_sprite.y == 96 and warning_door_2 == True:
+        if menu_open == False:
+            splash.append(door_control_menu_sprite)
+        menu_open = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if door_control_menu_sprite in splash:
+                    splash.remove(door_control_menu_sprite)
+                if warning_door_2_sprite in splash:
+                    splash.remove(warning_door_2_sprite)
+                splash.append(door_2_sprite)
+                warning_door_2 = False
+                menu_open = False
+                score += score_increment
+                score_round_increment += score_penalty
+
     # why is it crashing ffs
+    # fixed it, I am literally a god
 
     if score <= 0 and game_over == False:
         game_over = True
