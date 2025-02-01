@@ -34,7 +34,7 @@ eevee_sprite = displayio.TileGrid(
 
 splash.append(eevee_sprite)
 
-fireball_bitmap = displayio.OnDiskBitmap("fireball.bmp")
+fireball_bitmap = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
 
 fireballs = []
 
@@ -108,7 +108,7 @@ while True:
             eevee_sprite.x -= speed
         if keys[pygame.K_RIGHT]:
             eevee_sprite.x += speed
-        if random.random() < 0.05:  # spawn rate
+        if random.random() < 0.025:  # spawn rate
             spawn_fireball()
 
     for fireball in fireballs:
@@ -121,7 +121,6 @@ while True:
             display_game_over()
 
     eevee_sprite[0] = frame
-    # frame = (frame + 1) % (eevee_sprite.width // tile_width)
     frame = (frame + 1) % (4)
 
     time.sleep(0.1)
