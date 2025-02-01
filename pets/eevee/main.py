@@ -121,6 +121,7 @@ while True:
             display_game_over()
 
     eevee_sprite[0] = frame
-    frame = 5 % (eevee_sprite.width // tile_width)
+    # frame = (frame + 1) % (eevee_sprite.width // tile_width)
+    frame = (frame + 1) % (4)
 
     time.sleep(0.1)
