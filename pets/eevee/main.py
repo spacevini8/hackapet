@@ -11,8 +11,22 @@ display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
 
-house = displayio.OnDiskBitmap("sprites/house.bmp")
-bg_sprite = displayio.TileGrid(house, pixel_shader=house.pixel_shader)
+# house = displayio.OnDiskBitmap("sprites/house.bmp")
+# bg_sprite = displayio.TileGrid(house, pixel_shader=house.pixel_shader)
+# splash.append(bg_sprite)
+
+bg_sheet = displayio.OnDiskBitmap("sprites/home.bmp")
+bg_sprite= displayio.TileGrid(
+    bg_sheet,
+    pixel_shader=bg_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+    x=(display.width - 128) // 2,
+    y=display.height - 128 - 0
+    )
 splash.append(bg_sprite)
 
 eevee_sheet = displayio.OnDiskBitmap("sprites/EeveeIdle.bmp")
@@ -83,7 +97,7 @@ def display_game_over():
     fireballs.clear()
 
 frame = 0
-speed = 4 
+speed = 4
 game_over = False
 
 while True:
@@ -121,6 +135,9 @@ while True:
             display_game_over()
 
     eevee_sprite[0] = frame
-    frame = (frame + 1) % (4)
+    frame = (frame + 1) % 4
+
+    bg_sprite[0] = frame
+    frames = (frame + 1) % 4
 
     time.sleep(0.1)
