@@ -19,11 +19,11 @@ foodDecrese = 1
 bugIncrese = 1
 
 #Note: Higher number means lower chance
-chanceOfDecrese = 1000
-chanceOfBug = 500
-chanceOfDamg = 700
+chanceOfDecrese = 200
+chanceOfBug = 150
+chanceOfDamg = 150
 chanceOfHeal = 700
-chanceOfGrowth = 100
+chanceOfGrowth = 550
 
 def updateBar(splash, bar, maxBar, thing, maxThing, color):
     if bar:
@@ -36,8 +36,9 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
     
 
 pygame.init()
-display=PyGameDisplay(width=128, height=128,hw_accel=False)
-splash = displayio.Group()
+scale = 1
+display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+splash = displayio.Group(scale=scale)
 
 display.show(splash)
 
@@ -95,8 +96,8 @@ healthOutline = Rect(10,28,32,4,outline=0xFFFFFF)
 
 waterBar = updateBar(splash, None, waterOutline,spud.water,spud.maxWater,0x0000FF)
 foodBar = updateBar(splash, None, foodOutline, spud.food, spud.maxFood, 0xDAA06D)
-bugBar = updateBar(splash, None, bugOutline, spud.bugs, spud.maxBugs, 0xFF0000)
-healthBar = updateBar(splash, None, healthOutline, spud.health, spud.maxHealth, 0x00FF00)
+bugBar = updateBar(splash, None, bugOutline, spud.bugs, spud.maxBugs, 0x94b21c)
+healthBar = updateBar(splash, None, healthOutline, spud.health, spud.maxHealth, 0xFF0000)
 
 splash.append(waterOutline)
 splash.append(foodOutline)
@@ -140,12 +141,10 @@ while True:
         spud.water -= waterDecrese
         if spud.water < 0:
             spud.water = 0
-        print(f"water:{spud.water}")
     if randNum == 1:
         spud.food -= foodDecrese
         if spud.food < 0:
             spud.food = 0
-        print(f"food:{spud.food}")
     
     #add bugs
     if spud.water > (spud.maxWater*0.75) or spud.food > (spud.maxFood*0.75):
@@ -157,7 +156,6 @@ while True:
             spud.bugs+=1
             if spud.bugs > spud.maxBugs:
                 spud.bugs = spud.maxBugs
-            print(f"bugs:{spud.bugs}")
     
     if spud.water < (spud.maxWater*0.25) or spud.food < (spud.maxFood*0.25):
         if spud.water < (spud.maxWater*0.25) and spud.food < (spud.maxFood*0.25):
@@ -206,15 +204,11 @@ while True:
                 if spud.growthStages[spud.curentStage].image:
                     splash.append(spud.growthStages[spud.curentStage].image)
 
-            
-
-    #textArea.text = f"Water: {spud.water}\nFerilizer: {spud.food}\nBugs: {spud.bugs}"
-    
-    
+        
     waterBar = updateBar(splash, waterBar, waterOutline, spud.water, spud.maxWater, 0x0000FF)
     foodBar = updateBar(splash, foodBar,foodOutline,spud.food,spud.maxFood,0xDAA06D)
-    bugBar = updateBar(splash, bugBar, bugOutline, spud.bugs, spud.maxBugs, 0xFF0000)
-    healthBar = updateBar(splash, healthBar, healthOutline, spud.health, spud.maxHealth, 0x00FF00)
+    bugBar = updateBar(splash, bugBar, bugOutline, spud.bugs, spud.maxBugs, 0x94b21c)
+    healthBar = updateBar(splash, healthBar, healthOutline, spud.health, spud.maxHealth, 0xFF0000)
 
     
     
