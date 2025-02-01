@@ -73,10 +73,24 @@ AME_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+AME_warning = displayio.OnDiskBitmap("AME_warning.bmp")
+
+AME_warning_sprite = displayio.TileGrid(
+	AME_normal, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
 door_control_menu = displayio.OnDiskBitmap("door_control.bmp")
 
 door_control_menu_sprite = displayio.TileGrid(
 	door_control_menu, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+AME_control_menu = displayio.OnDiskBitmap("AME_control.bmp")
+
+AME_control_menu_sprite = displayio.TileGrid(
+	AME_control_menu, 
 	pixel_shader=space_station_background.pixel_shader
 )
 
@@ -154,8 +168,11 @@ penalty_door_1 = False
 warning_door_2 = False
 penalty_door_2 = False
 warning_AME = False
+penalty_AME = False
 warning_Singulo = False
+penalty_Singulo = False
 warning_TEG = False
+penalty_TEG = False
 frame = 0
 speed = 32
 
@@ -210,7 +227,7 @@ while True:
                 food_reduced_price = 10
                 round = 0
                 hunger = 10
-                hunger_increment = 20
+                hunger_increment = 30
                 hunger_round_increment = 10
                 hunger_cost = 2
                 hunger_reset = False #ignore this, I am dum
@@ -221,8 +238,11 @@ while True:
                 warning_door_2 = False
                 penalty_door_2 = False
                 warning_AME = False
+                penalty_AME = False
                 warning_Singulo = False
+                penalty_Singulo = False
                 warning_TEG = False
+                penalty_TEG = False
                 frame = 0
                 speed = 32
 
@@ -361,7 +381,7 @@ while True:
     round_score_label.text = f"rnd: {score_round_increment}"
     display.refresh()
 
-    # score overflow reset
+    # score overflow reset (why is this even here? can't be bothered to find where it should be)
 
     # I HAVE NO IDEA WHAT I'M DOING! :D
 
