@@ -35,6 +35,15 @@ door_1_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+warning_door_1 = displayio.OnDiskBitmap("door_1_open.bmp")
+
+warning_door_1_sprite = displayio.TileGrid(
+	warning_door_1, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+door_2_sprite = displayio.OnDiskBitmap("door_2.bmp")
+
 door_2_sprite = displayio.OnDiskBitmap("door_2.bmp")
 
 door_2_sprite = displayio.TileGrid(
@@ -118,37 +127,28 @@ splash.append(erebus_sprite)
 game_over = False
 menu_open = False
 score = 10
-score_increment = 10
+score_increment = 20
+score_round_increment = 50
+score_penalty = 30
+score_overflow_reset_completed = False
 food_price = 6
 food_reduced_price = 3
 round = 0
 hunger = 10
 hunger_increment = 20
 hunger_round_increment = 10
+hunger_cost = 2
 hunger_reset = False #ignore this, I am dum
 ate = False
 warning = False
 warning_door_1 = False
+penalty_door_1 = False
 warning_door_2 = False
 warning_AME = False
 warning_Singulo = False
 warning_TEG = False
 frame = 0
 speed = 32
-
-class Score(object):
-    def __init__(self):
-        self.black = 0,0,0
-        self.count = 0
-        self.font = pygame.font.SysFont("comicsans",50, True , True)
-        self.text = self.font.render("Score : "+str(self.count),1,self.black)
-
-    def show_score(self, screen):
-        screen.blit(self.text, (100 ,100))
-
-    def score_up(self):
-        self.count += 1
-        self.text = self.font.render("Score : "+str(self.count),1,self.black)
 
 while True:
     for event in pygame.event.get():
@@ -159,18 +159,21 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
-            elif event.key == pygame.K_LEFT and game_over == False:
+            elif event.key == pygame.K_LEFT and game_over == False and menu_open == False:
                 erebus_sprite.x -= speed
+                hunger += hunger_cost
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
                 print ("Hunger: ", hunger)
-            elif event.key == pygame.K_RIGHT and game_over == False:
+            elif event.key == pygame.K_RIGHT and game_over == False and menu_open == False:
                 erebus_sprite.x += speed
+                hunger += hunger_cost
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
                 print ("Hunger: ", hunger)
-            elif event.key == pygame.K_UP and game_over == False:
+            elif event.key == pygame.K_UP and game_over == False and menu_open == False:
                 erebus_sprite.y -= speed
+                hunger += hunger_cost
                 print ("x:", erebus_sprite.x)
                 print ("y:", erebus_sprite.y)
                 print ("Hunger: ", hunger)
@@ -179,26 +182,30 @@ while True:
                 game_over = False
                 menu_open = False
                 score = 10
-                score_increment = 10
+                score_increment = 20
+                score_round_increment = 50
+                score_penalty = 30
+                score_overflow_reset_completed = False
                 food_price = 6
                 food_reduced_price = 3
                 round = 0
                 hunger = 10
                 hunger_increment = 20
                 hunger_round_increment = 10
+                hunger_cost = 2
                 hunger_reset = False #ignore this, I am dum
                 ate = False
                 warning = False
                 warning_door_1 = False
+                penalty_door_1 = False
                 warning_door_2 = False
                 warning_AME = False
                 warning_Singulo = False
                 warning_TEG = False
                 frame = 0
                 speed = 32
-                score += score_increment
 
-    #wrap around the sides
+    # side walls
     if erebus_sprite.x < 0:
         erebus_sprite.x = 0
     elif erebus_sprite.x > display.width - tile_width:
@@ -206,16 +213,25 @@ while True:
 
     erebus_sprite.x = erebus_sprite.x
     
-    #wrap around the top
+    # wrap around the top and round progression
     if erebus_sprite.y < 0:
         erebus_sprite.y = display.height - tile_height
-        score += score_increment #temporary
+        score += score_round_increment
         round += 1
         hunger += hunger_round_increment
         ate = False
         print ("Round: ", round)
         print ("Score: ", score)
         print ("Hunger: ", hunger)
+        if warning_door_1 == False:
+            warning_door_1 = True # REMOVE THIS LATER!!!
+
+    # food
+    # btw, that's not rice, 
+    # it's cloth, 
+    # because that's what moths eat,
+    # in this game,
+    # and Erebus is a moth
 
     if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 20:
         hunger -= hunger_increment
@@ -230,12 +246,54 @@ while True:
         print ("Score: ", score)
         ate = True
 
+    # door_1
+
+    if warning_door_1 == True:
+        splash.append(warning_door_1_sprite)
+        if door_1_sprite in splash:
+            splash.remove(door_1_sprite)
+        if penalty_door_1 == False:
+            score_round_increment -= score_penalty
+            penalty_door_1 = True
+    else:
+        if warning_door_1_sprite in splash:
+            splash.remove(warning_door_1_sprite)
+        if door_1_sprite not in splash:
+            splash.append(door_1_sprite)
+        if erebus_sprite in splash:
+            splash.remove(erebus_sprite)
+        if erebus_sprite not in splash:
+            splash.append(erebus_sprite)
+
+    if erebus_sprite.x == 96 and erebus_sprite.y == 96 and warning_door_1 == True:
+        splash.append(door_control_menu_sprite)
+        menu_open = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if door_control_menu_sprite in splash:
+                    splash.remove(door_control_menu_sprite)
+                if warning_door_1_sprite in splash:
+                    splash.remove(warning_door_1_sprite)
+                splash.append(door_1_sprite)
+                warning_door_1 = False
+                menu_open = False
+                score += score_increment
+                score_round_increment += score_penalty
+
+    # why is it crashing ffs
+
     if score <= 0 and game_over == False:
         game_over = True
-        print ("Game Over")
+        print("Game Over")
         splash.append(game_over_menu_sprite)
 
-    #I HAVE NO IDEA WHAT I'M DOING! :D
+    if score <= 0 and score_overflow_reset_completed == False:
+        score = 0
+        score_overflow_reset_completed = True
+
+    # score overflow reset
+
+    # I HAVE NO IDEA WHAT I'M DOING! :D
 
     #if hunger <= 0 and hunger_reset == False:
         #hunger = 0
@@ -246,3 +304,22 @@ while True:
     frame = (frame + 1) % (erebus_sheet.width // tile_width)
 
     pygame.time.wait(100)
+
+    #let him cook
+
+    # ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠆⠜⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⠿⠿⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣿⣿⣿⣿⣿
+    # ⣿⣿⡏⠁⠀⠀⠀⠀⠀⣀⣠⣤⣤⣶⣶⣶⣶⣶⣦⣤⡄⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿
+    # ⣿⣿⣷⣄⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⡧⠇⢀⣤⣶⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣾⣮⣭⣿⡻⣽⣒⠀⣤⣜⣭⠐⢐⣒⠢⢰⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⣏⣿⣿⣿⣿⣿⣿⡟⣾⣿⠂⢈⢿⣷⣞⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣷⣶⣾⡿⠿⣿⠗⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠻⠋⠉⠑⠀⠀⢘⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⣿⡿⠟⢹⣿⣿⡇⢀⣶⣶⠴⠶⠀⠀⢽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⣿⣿⣿⡿⠀⠀⢸⣿⣿⠀⠀⠣⠀⠀⠀⠀⠀⡟⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⣿⣿⣿⡿⠟⠋⠀⠀⠀⠀⠹⣿⣧⣀⠀⠀⠀⠀⡀⣴⠁⢘⡙⢿⣿⣿⣿⣿⣿⣿⣿⣿
+    # ⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⠗⠂⠄⠀⣴⡟⠀⠀⡃⠀⠉⠉⠟⡿⣿⣿⣿⣿
+    #⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢷⠾⠛⠂⢹⠀⠀⠀⢡⠀⠀⠀⠀⠀⠙⠛⠿⢿
