@@ -46,9 +46,8 @@ splash.append(right_arrow_text)
 splash.append(start_text_1)
 splash.append(start_text_2)
 
-# setup score text
+# setup score
 score = 0
-score_text = label.Label(font, text=str(score))
 
 # load kirbo sprites
 kirbo_sheet = displayio.OnDiskBitmap("assets/kirbo_idle.bmp")
@@ -140,13 +139,15 @@ def display_game_over(splash, title_sprite, foods):
         splash.remove(layer)
     foods.clear()
 
-    # setup game over text
-    game_over_text = label.Label(font, text="GAME OVER!", color=text_color, x=(display.width//2)-58, y=(display.height//2)-24, scale=2)
-    restart_text_1 = label.Label(reg_font, text="press to", color=text_color, x=(display.width//2)-40, y=(display.height//2)+4)
-    restart_text_2 = label.Label(reg_font, text="play again!", color=text_color, x=(display.width//2)-54, y=(display.height//2)+20)
+    # setup game over text + score
+    game_over_text = label.Label(font, text="GAME OVER!", color=text_color, x=(display.width//2)-58, y=(display.height//2)-28, scale=2)
+    score_text = label.Label(reg_font, text=f"score: {score}", color=text_color, x=(display.width//2)-40-len(str(score)), y=(display.height//2)-12)
+    restart_text_1 = label.Label(reg_font, text="press to", color=text_color, x=(display.width//2)-44, y=(display.height//2)+12)
+    restart_text_2 = label.Label(reg_font, text="play again!", color=text_color, x=(display.width//2)-54, y=(display.height//2)+30)
 
     splash.append(title_sprite)
     splash.append(game_over_text)
+    splash.append(score_text)
     splash.append(restart_text_1)
     splash.append(restart_text_2)
 
@@ -210,6 +211,7 @@ while True:
             spawn_food_time = 20
 
             cur_kirbo = kirbo_sprite
+            score = 0
     
     # game stuff
     else:
@@ -325,6 +327,7 @@ while True:
             if cur_kirbo != kirbo_sprite and check_collision(cur_kirbo, item):
                 splash.remove(item)
                 foods.remove(item)
+                score += 1
             # end game if kirbo misses a food
             if item.x < -32:
                 game_over = True
