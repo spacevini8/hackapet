@@ -29,15 +29,26 @@ bg_sprite = displayio.TileGrid(
 splash.append(title_sprite)
 
 # load font
-font = bitmap_font.load_font("assets/SaikyoSansBold-8.bdf")
+font = bitmap_font.load_font("assets/courB08.bdf")
+reg_font = bitmap_font.load_font("assets/courB12.bdf")
+text_color = 0xFFE0EE
 
 # setup title text
-title_text = label.Label(font, text="KIRBOCHOMP", color=0x381010, x=(display.width//2)-len("KIRBOCHOMP")-28, y=display.height//2-24, scale=1)
-splash.append(title_text)
+title_text = label.Label(font, text="KIRBOCHOMP", color=text_color, x=(display.width//2)-len("KIRBOCHOMP")-48, y=display.height//2-36, scale=2)
+left_arrow_text = label.Label(reg_font, text="LEFT - UP", color=text_color, x=(display.width//2)-50, y=(display.height//2)-8)
+right_arrow_text = label.Label(reg_font, text="RIGHT - DOWN", color=text_color, x=(display.width//2)-60, y=(display.height//2)+10)
+start_text_1 = label.Label(reg_font, text="press to", color=text_color, x=(display.width//2)-40, y=(display.height//2)+24)
+start_text_2 = label.Label(reg_font, text="start!", color=text_color, x=(display.width//2)-28, y=(display.height//2)+38)
 
-# setup game over text
+splash.append(title_text)
+splash.append(left_arrow_text)
+splash.append(right_arrow_text)
+splash.append(start_text_1)
+splash.append(start_text_2)
 
 # setup score text
+score = 0
+score_text = label.Label(font, text=str(score))
 
 # load kirbo sprites
 kirbo_sheet = displayio.OnDiskBitmap("assets/kirbo_idle.bmp")
@@ -123,20 +134,21 @@ def check_collision(sprite1, sprite2):
         return True
     return False
 
-# load game end bg
-game_end_bg = displayio.OnDiskBitmap("assets/game_over.bmp")
-
-end_sprite = displayio.TileGrid(
-    game_end_bg,
-    pixel_shader=game_end_bg.pixel_shader
-)
-
 # clear screen and display game end bg
-def display_game_over(end_sprite, foods):
-    for item in splash:
-        splash.remove(item)
+def display_game_over(splash, title_sprite, foods):
+    for layer in splash:
+        splash.remove(layer)
     foods.clear()
-    splash.append(end_sprite)
+
+    # setup game over text
+    game_over_text = label.Label(font, text="GAME OVER!", color=text_color, x=(display.width//2)-58, y=(display.height//2)-24, scale=2)
+    restart_text_1 = label.Label(reg_font, text="press to", color=text_color, x=(display.width//2)-40, y=(display.height//2)+4)
+    restart_text_2 = label.Label(reg_font, text="play again!", color=text_color, x=(display.width//2)-54, y=(display.height//2)+20)
+
+    splash.append(title_sprite)
+    splash.append(game_over_text)
+    splash.append(restart_text_1)
+    splash.append(restart_text_2)
 
 # keep track of frame, speed, current kirbo sprite
 frame = 0
@@ -171,7 +183,9 @@ while True:
     if not game_start:
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_SPACE]:
             game_start = True
-            splash.remove(title_sprite)
+            for layer in splash:
+                splash.remove(layer)
+
             splash.append(bg_sprite)
             splash.append(kirbo_sprite)
 
@@ -179,7 +193,9 @@ while True:
     elif game_over:
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_SPACE]:
             game_over = False
-            splash.remove(end_sprite)
+            for layer in splash:
+                splash.remove(layer)
+
             splash.append(bg_sprite)
             splash.append(kirbo_sprite)
 
@@ -312,6 +328,9 @@ while True:
             # end game if kirbo misses a food
             if item.x < -32:
                 game_over = True
-                display_game_over(end_sprite, foods)
+                for layer in splash:
+                    splash.remove(layer)
+                display_game_over(splash, title_sprite, foods)
+                break
 
     time.sleep(0.08)
