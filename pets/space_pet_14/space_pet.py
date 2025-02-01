@@ -31,12 +31,16 @@ bg_sprite = displayio.TileGrid(
 tile_width = 32
 tile_height = 32
 
+# warning door 1 sprite
+
 door_1 = displayio.OnDiskBitmap("door_1.bmp")
 
 door_1_sprite = displayio.TileGrid(
 	door_1, 
 	pixel_shader=space_station_background.pixel_shader
 )
+
+# warning door 1 sprite
 
 warning_door_1 = displayio.OnDiskBitmap("door_1_open.bmp")
 
@@ -45,12 +49,16 @@ warning_door_1_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+# door 2 sprite
+
 door_2 = displayio.OnDiskBitmap("door_2.bmp")
 
 door_2_sprite = displayio.TileGrid(
 	door_2, 
 	pixel_shader=space_station_background.pixel_shader
 )
+
+# warning door 2 sprite
 
 warning_door_2 = displayio.OnDiskBitmap("door_2_open.bmp")
 
@@ -59,12 +67,16 @@ warning_door_2_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+# food dispenser sprite
+
 food_dispenser = displayio.OnDiskBitmap("food_dispenser.bmp")
 
 food_dispenser_sprite = displayio.TileGrid(
 	food_dispenser, 
 	pixel_shader=space_station_background.pixel_shader
 )
+
+# AME sprite
 
 AME_normal = displayio.OnDiskBitmap("AME_normal.bmp")
 
@@ -73,12 +85,53 @@ AME_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+# AME warning sprite
+
 AME_warning = displayio.OnDiskBitmap("AME_warning.bmp")
 
 AME_warning_sprite = displayio.TileGrid(
 	AME_warning, 
 	pixel_shader=space_station_background.pixel_shader
 )
+
+# singulo sprite
+
+singulo_normal = displayio.OnDiskBitmap("singulo_normal.bmp")
+
+singulo_sprite = displayio.TileGrid(
+	singulo_normal, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+# singulo warning sprite
+
+singulo_warning = displayio.OnDiskBitmap("singulo_warning.bmp")
+
+singulo_warning_sprite = displayio.TileGrid(
+	singulo_warning, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+# solar sprite
+
+solar_normal = displayio.OnDiskBitmap("solar_normal.bmp")
+
+solar_sprite = displayio.TileGrid(
+	solar_normal, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+# solar warning sprite
+
+solar_warning = displayio.OnDiskBitmap("solar_warning.bmp")
+
+solar_warning_sprite = displayio.TileGrid(
+	solar_warning, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+
+# door control menu sprite
 
 door_control_menu = displayio.OnDiskBitmap("door_control.bmp")
 
@@ -87,6 +140,8 @@ door_control_menu_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+# AME control menu sprite
+
 AME_control_menu = displayio.OnDiskBitmap("AME_control.bmp")
 
 AME_control_menu_sprite = displayio.TileGrid(
@@ -94,12 +149,34 @@ AME_control_menu_sprite = displayio.TileGrid(
 	pixel_shader=space_station_background.pixel_shader
 )
 
+# singulo control menu sprite
+
+singulo_control_menu = displayio.OnDiskBitmap("singulo_control.bmp")
+
+singulo_control_menu_sprite = displayio.TileGrid(
+	singulo_control_menu, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+# solar control menu sprite
+
+solar_control_menu = displayio.OnDiskBitmap("solar_control.bmp")
+
+solar_control_menu_sprite = displayio.TileGrid(
+	solar_control_menu, 
+	pixel_shader=space_station_background.pixel_shader
+)
+
+# game over menu sprite
+
 game_over_menu = displayio.OnDiskBitmap("game_over.bmp")
 
 game_over_menu_sprite = displayio.TileGrid(
 	game_over_menu, 
 	pixel_shader=space_station_background.pixel_shader
 )
+
+# starvation menu sprite
 
 starvation_menu = displayio.OnDiskBitmap("starvation.bmp")
 
@@ -113,6 +190,8 @@ splash.append(door_1_sprite)
 splash.append(door_2_sprite)
 splash.append(food_dispenser_sprite)
 splash.append(AME_sprite)
+splash.append(singulo_sprite)
+splash.append(solar_sprite)
 
 erebus_sheet = displayio.OnDiskBitmap("erebus_sheet.bmp")
 
@@ -160,7 +239,7 @@ game_round = 0
 score = 10
 score_increment = 20
 score_round_increment = 50
-score_penalty = 30
+score_penalty = 50
 score_overflow_reset_completed = False
 food_price = 15#*round(game_round/2)
 food_reduced_price = 10
@@ -185,13 +264,13 @@ penalty_TEG = False
 frame = 0
 speed = 32
 
-score_label = label.Label(font, text=f"Score: {score}", color=0xFFFFFF, x=32, y=10)
+score_label = label.Label(font, text=f"Score: {score}", color=0xFFFFFF, x=34, y=10)
 splash.append(score_label)
 
-hunger_label = label.Label(font, text=f"Hunger: {hunger}", color=0xFFFFFF, x=30, y=32)
+hunger_label = label.Label(font, text=f"Hunger: {hunger}", color=0xFFFFFF, x=34, y=32)
 splash.append(hunger_label)
 
-round_score_label = label.Label(font, text=f"income: {score_round_increment}", color=0xFFFFFF, x=32, y=54)
+round_score_label = label.Label(font, text=f"income: {score_round_increment}", color=0xFFFFFF, x=34, y=54)
 splash.append(round_score_label)
 
 round_label = label.Label(font, text=f"round: {game_round}", color=0xFFFFFF, x=35, y=74)
