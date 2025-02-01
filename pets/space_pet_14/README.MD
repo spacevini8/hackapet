@@ -4,6 +4,8 @@ This is a game inspired by the games [Space Station 13/14](https://spacestation1
 
 Your are a [moth person](https://wiki.spacestation14.com/wiki/Playable_Species#Moths) (yes, you read that right) by the name "Erebus Nightflitter", you're on a [space station](https://wiki.spacestation14.com/wiki/Maps) and you're working as an engineer, your job is to keep the station running, earn points and don't screw anything up!
 
+gameplay [demo](https://youtu.be/gCtNhB3if1c)
+
 # Your Job
 
 You have to do a couple things to keep the station afloat
