@@ -426,10 +426,8 @@ def ending():
                 
                 def afterFade():
                     def afterTalk2():
-                        def afterWait3():
-                            fade.direction = 1
-                        
-                        timer.createAndStartTimer(20, afterWait3)
+                        global currentState
+                        currentState = "theEnd"
 
                     global currentMap
                     currentMap = "ending"
@@ -588,6 +586,11 @@ splash.append(dialogue.label)
 
 dialogue.loadSpeaker("assets/faces/stella.bmp", "stella")
 
+theEndSheet = displayio.OnDiskBitmap("assets/the_end.bmp")
+theEndSprite = displayio.TileGrid(theEndSheet, pixel_shader=theEndSheet.pixel_shader)
+theEndSprite.y = -60
+splash.append(theEndSprite)
+
 for name, speaker in dialogue.speakers.items():
     splash.append(speaker)
 
@@ -669,11 +672,14 @@ while True:
     greygooseBossfight.update(goose)
     goose.update()
     mushroomScavenging.update(dialogue)
-    print(currentState)
+
     if currentState == "mushroom_gathering":
         if mushroomScavenging.win:
             currentState = "ending"
             finishedGathering()
+
+    if currentState == "theEnd" and theEndSprite.y < 0:
+        theEndSprite.y += 3
 
     if stella.customUpdate != None: stella.customUpdate(goose.x, currentMap)
     
