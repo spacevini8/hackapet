@@ -123,6 +123,8 @@ class Obstacle:
 class Game:
     def __init__(self):
         self.show_title = True
+        self.start_time = None
+        self.survival_time = 0
         
         self.title_sprite = OnDiskBitmap("sprites/title.png")
         self.title_palette = self.title_sprite.pixel_shader
@@ -186,7 +188,6 @@ class Game:
         
         self.dino = Dinosaur()
         self.obstacles = []
-        self.score = 0
         self.game_over = False
         
         self.ground_palette = displayio.Palette(1)
@@ -200,10 +201,62 @@ class Game:
         
         main_group.append(self.ground_grid)
         main_group.append(self.dino.tile_grid)
+        
+        # Remove score-related code and add game over display
+        self.game_over_group = displayio.Group()
+        
+        # Create black background for game over screen
+        self.black_bg = displayio.Bitmap(128, 128, 1)
+        self.black_palette = displayio.Palette(1)
+        self.black_palette[0] = BLACK
+        self.black_bg_grid = displayio.TileGrid(
+            self.black_bg,
+            pixel_shader=self.black_palette
+        )
+        self.game_over_group.append(self.black_bg_grid)
+        
+        # Load pumpkin sprite for rating
+        self.pumpkin_sprite = OnDiskBitmap("sprites/pumpkin.png")
+        self.pumpkin_palette = self.pumpkin_sprite.pixel_shader
+        
+        # Create three pumpkin sprites
+        self.pumpkins = []
+        for i in range(3):
+            pumpkin = TileGrid(
+                bitmap=self.pumpkin_sprite,
+                pixel_shader=self.pumpkin_palette,
+                width=1,
+                height=1,
+                tile_width=16,
+                tile_height=16
+            )
+            pumpkin.x = 40 + (i * 24)  # Space pumpkins horizontally
+            pumpkin.y = 56  # Center vertically
+            self.pumpkins.append(pumpkin)
     
     def start_game(self):
         self.show_title = False
+        self.start_time = time.monotonic()
         display.show(main_group)
+    
+    def show_game_over(self):
+        self.survival_time = time.monotonic() - self.start_time
+        
+        # Clear game over group and add black background
+        while len(self.game_over_group) > 1:
+            self.game_over_group.pop()
+            
+        # Add appropriate number of pumpkins based on survival time
+        if self.survival_time >= 30:
+            for pumpkin in self.pumpkins:
+                self.game_over_group.append(pumpkin)
+        elif self.survival_time >= 10:
+            for pumpkin in self.pumpkins[:2]:
+                self.game_over_group.append(pumpkin)
+        else:
+            self.game_over_group.append(self.pumpkins[0])
+            
+        display.show(self.game_over_group)
     
     def update_background(self):
         self.bg1.x -= BACKGROUND_SCROLL_SPEED
@@ -229,7 +282,6 @@ class Game:
         if not self.show_title:
             if not self.game_over:
                 self.update_background()
-                
                 self.dino.update()
                 
                 self.spawn_obstacle()
@@ -238,18 +290,20 @@ class Game:
                     
                     if self.check_collision(obstacle):
                         self.game_over = True
+                        self.show_game_over()
                     
                     if obstacle.is_off_screen():
                         main_group.remove(obstacle.tile_grid)
                         self.obstacles.remove(obstacle)
-                
-                self.score += 1
 
 def main():
     game = Game()
-    clock = pygame.time.Clock()
+    last_update = time.monotonic()
+    update_interval = 1/60  # 60 FPS
     
     while True:
+        current_time = time.monotonic()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -266,11 +320,14 @@ def main():
                     else:
                         game.dino.jump()
         
-        if not game.show_title:
-            game.update()
+        # Update game at fixed time intervals
+        if current_time - last_update >= update_interval:
+            if not game.show_title:
+                game.update()
+            last_update = current_time
         
         display.refresh()
-        clock.tick(60)
+        time.sleep(max(0, update_interval - (time.monotonic() - current_time)))
 
 if __name__ == "__main__":
     main()
