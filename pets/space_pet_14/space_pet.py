@@ -227,9 +227,9 @@ splash.append(erebus_sprite)
 #Singulo
 #x = 0
 #Y = 32
-#TEG
-#x = 96
-#Y = 32
+#solar
+#x = 0
+#Y = 0
 
 #here be warnings
 game_over = False
@@ -259,8 +259,8 @@ warning_AME = False
 penalty_AME = False
 warning_Singulo = False
 penalty_Singulo = False
-warning_TEG = False
-penalty_TEG = False
+warning_solar = False
+penalty_solar = False
 frame = 0
 speed = 32
 
@@ -372,6 +372,9 @@ while True:
             #score_round_increment -= score_penalty
         if warning_AME == False and warning_select == random.randint(1, 2):
             warning_AME = True
+            #score_round_increment -= score_penalty
+        if warning_Singulo == False and warning_select == random.randint(1, 2):
+            warning_Singulo = True
             #score_round_increment -= score_penalty
 
     # food
@@ -499,6 +502,42 @@ while True:
                 warning_AME = False
                 menu_open = False
                 penalty_AME = False
+                score += score_increment
+                score_round_increment += score_penalty
+
+    # Singulo
+
+    if warning_Singulo == True:
+        splash.append(singulo_warning_sprite)
+        if singulo_sprite in splash:
+            splash.remove(singulo_sprite)
+        if penalty_Singulo == False:
+            score_round_increment -= score_penalty
+            penalty_Singulo = True
+    else:
+        if singulo_warning_sprite in splash:
+            splash.remove(singulo_warning_sprite)
+        if singulo_sprite not in splash:
+            splash.append(singulo_sprite)
+        if erebus_sprite in splash:
+            splash.remove(erebus_sprite)
+        if erebus_sprite not in splash:
+            splash.append(erebus_sprite)
+
+    if erebus_sprite.x == 0 and erebus_sprite.y == 32 and warning_Singulo == True:
+        if menu_open == False:
+            splash.append(singulo_control_menu_sprite)
+        menu_open = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if singulo_control_menu_sprite in splash:
+                    splash.remove(singulo_control_menu_sprite)
+                if singulo_warning_sprite in splash:
+                    splash.remove(singulo_warning_sprite)
+                splash.append(singulo_sprite)
+                warning_Singulo = False
+                menu_open = False
+                penalty_Singulo = False
                 score += score_increment
                 score_round_increment += score_penalty
 
