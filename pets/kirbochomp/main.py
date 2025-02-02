@@ -111,7 +111,7 @@ foods = []
 
 # spawn random food in top or bottom half of screen
 def spawn_food():
-    y_pos = random.choice([32, 64])
+    y_pos = random.choice([26, 58])
     cur_food = random.choice([cake_bitmap, candy_bitmap, star_bitmap, tomato_bitmap])
     food = displayio.TileGrid(
         cur_food,
