@@ -9,5 +9,7 @@ Sparky is your little robot companion! He can move around his home, and must be 
 On PC the buttons are mapped to:
 - Left button --> left arrow
 - Middle button --> up arrow
-- Right button --> right arrow
+- Right button --> right arrow  
 
+# Other
+I'm not sure if this is necessary, but my name on slack is "Danielle". Also, I made this in a few days and am hoping to add way more features if I get a board!
