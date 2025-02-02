@@ -122,7 +122,7 @@ def moveDog(target, pos):
 	dx = target_x - current_x
 	dy = target_y - current_y
 	distance = math.sqrt(dx**2 + dy**2)
-	
+
 	# If not at target, move dog
 	if distance > speed:
 		isDogMoving = True
