@@ -1,2 +1,3 @@
 **MEMORY BRAIN**  
-Press arrows in the sequence they flash, with the down, left and right keys. Your pet brain will flash for each sequence you get right. See how long of a sequence of arrows you can memorize!
+  
+Press arrows in the sequence they flash, with the Down, Left and Right keys. Your pet brain will flash for each sequence you get right. See how long of a sequence of arrows you can memorize!
