@@ -16,7 +16,7 @@ when in the menu, icons at the top of the screen will be displayed if croutonpet
 ## meters
 when the moon icon is displayed, croutonpet needs sleep
 
-when the water icon is displayed, croutonpet needs to drink, by selecting drink from the menu when standing on water
+when the water icon is displayed, croutonpet needs to drink (by selecting drink from the menu when standing on water)
 
 when the flower icon is displayed, croutonpet needs to enjoy the flower by sleeping on it
 
