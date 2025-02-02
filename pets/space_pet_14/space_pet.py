@@ -376,6 +376,9 @@ while True:
         if warning_Singulo == False and warning_select == random.randint(1, 2):
             warning_Singulo = True
             #score_round_increment -= score_penalty
+        if warning_solar == False and warning_select == random.randint(1, 2):
+            warning_solar = True
+            #score_round_increment -= score_penalty
 
     # food
     # btw, that's not rice, 
@@ -538,6 +541,42 @@ while True:
                 warning_Singulo = False
                 menu_open = False
                 penalty_Singulo = False
+                score += score_increment
+                score_round_increment += score_penalty
+
+    # solar
+
+    if warning_solar == True:
+        splash.append(solar_warning_sprite)
+        if solar_sprite in splash:
+            splash.remove(solar_sprite)
+        if penalty_solar == False:
+            score_round_increment -= score_penalty
+            penalty_solar = True
+    else:
+        if solar_warning_sprite in splash:
+            splash.remove(solar_warning_sprite)
+        if solar_sprite not in splash:
+            splash.append(solar_sprite)
+        if erebus_sprite in splash:
+            splash.remove(erebus_sprite)
+        if erebus_sprite not in splash:
+            splash.append(erebus_sprite)
+
+    if erebus_sprite.x == 0 and erebus_sprite.y == 0 and warning_solar == True:
+        if menu_open == False:
+            splash.append(solar_control_menu_sprite)
+        menu_open = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if solar_control_menu_sprite in splash:
+                    splash.remove(solar_control_menu_sprite)
+                if solar_warning_sprite in splash:
+                    splash.remove(solar_warning_sprite)
+                splash.append(solar_sprite)
+                warning_solar = False
+                menu_open = False
+                penalty_solar = False
                 score += score_increment
                 score_round_increment += score_penalty
 
