@@ -1,6 +1,7 @@
 # croutonpet
 
 keep croutonpet alive 
+
 croutonpet has 4 metres which deplete over time and are filled up by doing certain activities. if all meters are depleted, croutonpet dies.
 
 ## controls
