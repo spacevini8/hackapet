@@ -29,9 +29,30 @@ columns = {
 }
 
 food = displayio.OnDiskBitmap("Food.bmp")
+start_screen_bmp = displayio.OnDiskBitmap("StartScreen.bmp")
+game_over_bmp = displayio.OnDiskBitmap("GameOver.bmp")
+numbers_bmp = displayio.OnDiskBitmap("numbers.bmp")
+game_started = False
+game_over = False
+score = 0
 
 bg_sprite = displayio.TileGrid(backgrounds[current_bg], pixel_shader=backgrounds[current_bg].pixel_shader)
 splash.append(bg_sprite)
+game_group = displayio.Group()
+splash.append(game_group)
+
+score_group = displayio.Group(x=100, y=8)
+food_small = displayio.TileGrid(food, pixel_shader=food.pixel_shader, x=0, y=0)
+score_group.append(food_small)
+splash.append(score_group)
+
+start_screen = displayio.TileGrid(
+    start_screen_bmp,
+    pixel_shader=start_screen_bmp.pixel_shader,
+    x=0,
+    y=0
+)
+splash.append(start_screen)
 
 bird = displayio.TileGrid(
     bird_frames[0],
@@ -43,26 +64,41 @@ splash.append(bird)
 
 active_columns = []
 active_collectibles = []
-
-score = 0
-score_bitmap = displayio.Bitmap(128, 8, 1)
-score_palette = displayio.Palette(1)
-score_palette[0] = 0xFFFFFF
-score_display = displayio.TileGrid(score_bitmap, pixel_shader=score_palette, x=0, y=4)
-splash.append(score_display)
-
 bird_velocity = 0
 gravity = 0.5
 jump_strength = -8
-game_over = False
 last_bg_switch = time.monotonic()
+last_frame = time.monotonic()
+last_spawn = time.monotonic()
+game_over_elements = None
+
+def update_score_display():
+    while len(score_group) > 1:
+        score_group.pop(-1)
+    x_offset = 20
+    for digit in str(score):
+        index = int(digit)
+        number_tile = displayio.TileGrid(
+            numbers_bmp,
+            pixel_shader=numbers_bmp.pixel_shader,
+            tile_width=8,
+            tile_height=8,
+            default_tile=index
+        )
+        number_tile.x = x_offset
+        score_group.append(number_tile)
+        x_offset += 8
 
 def reset_game():
-    global game_over, bird_velocity, score, current_bg, last_bg_switch, bird
+    global game_over, bird_velocity, score, current_bg, last_bg_switch, bird, game_started
     
     game_over = False
     bird_velocity = 0
     score = 0
+    update_score_display()
+    
+    if bird in game_group:
+        game_group.remove(bird)
     
     bird = displayio.TileGrid(
         bird_frames[0],
@@ -70,21 +106,22 @@ def reset_game():
         x=16,
         y=56
     )
-    splash.append(bird)
-    
-    score_bitmap.fill(0)
+    game_group.append(bird)
     
     for column in active_columns[:]:
-        splash.remove(column)
+        if column in game_group:
+            game_group.remove(column)
     active_columns.clear()
     
     for collectible in active_collectibles[:]:
-        splash.remove(collectible)
+        if collectible in game_group:
+            game_group.remove(collectible)
     active_collectibles.clear()
     
     current_bg = 0
     bg_sprite.bitmap = backgrounds[current_bg]
     last_bg_switch = time.monotonic()
+    game_started = True
 
 def switch_background():
     global current_bg
@@ -101,7 +138,7 @@ def spawn_column():
         y=y_position
     )
     active_columns.append(column)
-    splash.append(column)
+    game_group.append(column)
 
 def spawn_food():
     collectible = displayio.TileGrid(
@@ -111,7 +148,7 @@ def spawn_food():
         y=random.randint(16, 112)
     )
     active_collectibles.append(collectible)
-    splash.append(collectible)
+    game_group.append(collectible)
 
 def check_collision(obj1, obj2):
     return (
@@ -121,44 +158,32 @@ def check_collision(obj1, obj2):
         obj1.y + obj1.tile_height > obj2.y
     )
 
-def game_over_screen():
+def show_game_over():
+    global game_over_elements
+    
+    if game_over_elements is not None:
+        return
+    
+    if bird in game_group:
+        game_group.remove(bird)
+    
     dead_bird_grid = displayio.TileGrid(
         dead_bird,
         pixel_shader=dead_bird.pixel_shader,
         x=bird.x,
         y=bird.y
     )
-    splash.remove(bird)
-    splash.append(dead_bird_grid)
+    game_group.append(dead_bird_grid)
     
-    overlay_palette = displayio.Palette(1)
-    overlay_palette[0] = 0x404040 
-    overlay = displayio.Bitmap(128, 128, 1)
-    overlay_tilegrid = displayio.TileGrid(
-        overlay,
-        pixel_shader=overlay_palette,
-        x=0,
-        y=0
+    game_over_image = displayio.TileGrid(
+        game_over_bmp,
+        pixel_shader=game_over_bmp.pixel_shader,
+        x=(128 - game_over_bmp.width) // 2,
+        y=(128 - game_over_bmp.height) // 2
     )
+    splash.append(game_over_image)
     
-    text_palette = displayio.Palette(1)
-    text_palette[0] = 0xFFFFFF
-    text = displayio.Bitmap(64, 8, 1)
-    text_tilegrid = displayio.TileGrid(
-        text,
-        pixel_shader=text_palette,
-        x=32,
-        y=60
-    )
-    
-    splash.append(overlay_tilegrid)
-    splash.append(text_tilegrid)
-    
-    return overlay_tilegrid, text_tilegrid, dead_bird_grid
-
-last_frame = time.monotonic()
-last_spawn = time.monotonic()
-game_over_elements = None
+    game_over_elements = (dead_bird_grid, game_over_image)
 
 while True:
     current_time = time.monotonic()
@@ -170,24 +195,31 @@ while True:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             if game_over:
                 if game_over_elements:
-                    overlay, text, dead_bird_grid = game_over_elements
-                    splash.remove(overlay)
-                    splash.remove(text)
-                    splash.remove(dead_bird_grid)
+                    dead_bird_element, game_over_element = game_over_elements
+                    if dead_bird_element in game_group:
+                        game_group.remove(dead_bird_element)
+                    if game_over_element in splash:
+                        splash.remove(game_over_element)
                     game_over_elements = None
                 reset_game()
+            elif not game_started:
+                splash.remove(start_screen)
+                if bird in splash:
+                    splash.remove(bird)
+                game_started = True
             else:
                 bird_velocity = jump_strength
-        elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+        elif event.type == pygame.MOUSEBUTTONDOWN and game_started and not game_over:
             bird_velocity = jump_strength
 
-    if not game_over:
+    if game_started and not game_over:
         if current_time - last_frame > 0.15:
             bird.bitmap = bird_frames[int((current_time % 0.3) > 0.15)]
             last_frame = current_time
 
         bird_velocity += gravity
         bird.y += int(bird_velocity)
+        bird.y = max(16, min(112, bird.y))
 
         if current_time - last_bg_switch > 10:
             switch_background()
@@ -199,23 +231,31 @@ while True:
                 spawn_food()
             last_spawn = current_time
 
-        for column in active_columns:
+        for column in active_columns[:]:
             column.x -= 2
             if check_collision(bird, column):
                 game_over = True
-                game_over_elements = game_over_screen()
+                show_game_over()
+                break
 
-        for food_item in active_collectibles:
+        for food_item in active_collectibles[:]:
             food_item.x -= 2
             if check_collision(bird, food_item):
                 score += 1
-                score_bitmap[score-1, 0] = 1
-                splash.remove(food_item)
+                update_score_display()
+                if food_item in game_group:
+                    game_group.remove(food_item)
                 active_collectibles.remove(food_item)
 
-        active_columns[:] = [c for c in active_columns if c.x > -32]
-        active_collectibles[:] = [f for f in active_collectibles if f.x > -16]
-
-        bird.y = max(16, min(112, bird.y))
+        for c in active_columns[:]:
+            if c.x <= -32:
+                if c in game_group:
+                    game_group.remove(c)
+                active_columns.remove(c)
+        for f in active_collectibles[:]:
+            if f.x <= -16:
+                if f in game_group:
+                    game_group.remove(f)
+                active_collectibles.remove(f)
 
     time.sleep(0.016)
