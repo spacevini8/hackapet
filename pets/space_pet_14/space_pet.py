@@ -235,6 +235,7 @@ splash.append(erebus_sprite)
 game_over = False
 menu_open = False
 write_mode = False
+remove_splash = False
 game_round = 0
 score = 10
 score_increment = 20
@@ -582,6 +583,26 @@ while True:
 
     # why is it crashing ffs
     # fixed it, I am literally a god
+
+    if door_control_menu_sprite in splash and menu_open == True:
+        splash.append(door_control_menu_sprite)
+    elif door_control_menu_sprite in splash:
+        splash.remove(door_control_menu_sprite)
+
+    if AME_control_menu_sprite in splash and menu_open == True:
+        splash.append(AME_control_menu_sprite)
+    elif AME_control_menu_sprite in splash:
+        splash.remove(AME_control_menu_sprite)
+
+    if singulo_control_menu_sprite in splash and menu_open == True:
+        splash.append(singulo_control_menu_sprite)
+    elif singulo_control_menu_sprite in splash:
+        splash.remove(singulo_control_menu_sprite)
+
+    if solar_control_menu_sprite in splash and menu_open == True:
+        splash.append(solar_control_menu_sprite)
+    elif solar_control_menu_sprite in splash:
+        splash.remove(solar_control_menu_sprite)
 
     if score <= 0 and game_over == False:
         game_over = True
