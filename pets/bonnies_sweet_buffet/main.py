@@ -208,9 +208,12 @@ while True:
                 bombs.clear()
                 strawberries.clear()
                 goldberries.clear()
-                splash.remove(dead)
-                splash.remove(win)
+                if 'dead' in globals():
+                    splash.remove(dead)
+                if 'end' in globals():
+                    splash.remove(end)
                 game_over = False
+                state = 0
 
     keys = pygame.key.get_pressed()
 
