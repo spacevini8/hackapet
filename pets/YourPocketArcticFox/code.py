@@ -12,7 +12,7 @@ display = PyGameDisplay(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT)
 
 tile_width = 32
 tile_height = 32
-icon_size = 8
+icon_size = 16
 
 splash = displayio.Group()
 display.show(splash)
@@ -27,6 +27,7 @@ splash.append(bg_sprite)
 fox_idle_sheet = displayio.OnDiskBitmap("fox-idle-sheet.bmp")
 fox_walk_sheet = displayio.OnDiskBitmap("fox-walking-right-sheet.bmp")
 fox_dead_sheet = displayio.OnDiskBitmap("fox-dead.bmp")
+fox_happy_sheet = displayio.OnDiskBitmap("fox-happy.bmp")
 
 # load stick and rabbit leg sprites
 stick_sprite_sheet = displayio.OnDiskBitmap("stick.bmp")
@@ -37,7 +38,7 @@ total_walk_frames = fox_walk_sheet.width // tile_width
 total_idle_frames = fox_idle_sheet.width // tile_width
 
 # create fox sprite
-def create_fox_sprite(bitmap):
+def create_fox_sprite(bitmap, x_position):
     return displayio.TileGrid(
         bitmap,
         pixel_shader=bitmap.pixel_shader,
@@ -46,10 +47,10 @@ def create_fox_sprite(bitmap):
         width=1,
         height=1,
         default_tile=0,
-        x=(DISPLAY_WIDTH - tile_width) // 2,
+        x=x_position,
         y=DISPLAY_HEIGHT - tile_height - 10)
 
-fox_sprite = create_fox_sprite(fox_idle_sheet)
+fox_sprite = create_fox_sprite(fox_idle_sheet, (DISPLAY_WIDTH - tile_width) // 2)
 splash.append(fox_sprite)
 
 # load icons
@@ -79,7 +80,10 @@ hunger = 5
 happiness = 5
 health = 5
 
-#UPDATING ICONS BASED ON LEVELS
+HAPPY_DISPLAY_TIME = 2  # seconds for happy fox sprite
+time_happy_activated = 0  # store the time when happy sprite was activated
+
+# UPDATING ICONS BASED ON LEVELS
 def update_icons():
     splash.remove(hunger_sprite)
     if hunger >= 4:
@@ -99,21 +103,27 @@ def update_icons():
         happiness_sprite.bitmap = happiness_empty_icon
     splash.append(happiness_sprite)
 
-#idk why this one doesn't work helppp
-splash.remove(health_sprite)
-if happiness >= 4 and hunger >= 4:
-    happiness_sprite.bitmap = health_full_icon
-elif 2 <= happiness < 4 and 2 <= hunger < 4:
-    health_sprite.bitmap = health_halfway_icon
-else:
-    health_sprite.bitmap = health_empty_icon
-splash.append(health_sprite)
+    splash.remove(health_sprite)
+    if happiness >= 4 and hunger >= 4:
+        health_sprite.bitmap = health_full_icon
+    elif 2 <= happiness < 4 and 2 <= hunger < 4:
+        health_sprite.bitmap = health_halfway_icon
+    else:
+        health_sprite.bitmap = health_empty_icon
+    splash.append(health_sprite)
 
 def change_fox_sprite(new_bitmap):
     global fox_sprite
+    current_x_position = fox_sprite.x
     splash.remove(fox_sprite)
-    fox_sprite = create_fox_sprite(new_bitmap)
+    fox_sprite = create_fox_sprite(new_bitmap, current_x_position)
     splash.append(fox_sprite)
+
+# Function to display happy fox for a limited time
+def display_fox_happy():
+    global time_happy_activated
+    time_happy_activated = time.monotonic()
+    change_fox_sprite(fox_happy_sheet)
 
 state = "idle"
 frame = 0
@@ -130,11 +140,15 @@ HAPPINESS_DECAY = 14
 last_hunger_time = time.monotonic()
 last_happiness_time = time.monotonic()
 
-
 update_icons()
 
 while True:
     current_time = time.monotonic()
+
+    # Handle happy sprite duration
+    if time_happy_activated and current_time - time_happy_activated > HAPPY_DISPLAY_TIME:
+        change_fox_sprite(fox_walk_sheet)
+        time_happy_activated = 0  # reset timer
 
     # decrease hunger and happiness over time
     if current_time - last_hunger_time > HUNGER_DECAY:
@@ -183,6 +197,7 @@ while True:
                 rabbit_leg_sprite = displayio.TileGrid(rabbit_leg_sprite_sheet, pixel_shader=rabbit_leg_sprite_sheet.pixel_shader, x=50, y=50)
                 splash.append(rabbit_leg_sprite)
                 update_icons()
+                display_fox_happy()  # Display happy fox
                 print("Rabbit leg fed! Hunger increased.")
                 time.sleep(0.5)  # debounce delay
                 splash.remove(rabbit_leg_sprite)  # remove the sprite after a delay
@@ -192,6 +207,7 @@ while True:
                 stick_sprite = displayio.TileGrid(stick_sprite_sheet, pixel_shader=stick_sprite_sheet.pixel_shader, x=70, y=50)
                 splash.append(stick_sprite)
                 update_icons()
+                display_fox_happy()  # Display happy fox
                 print("Stick thrown! Happiness increased.")
                 time.sleep(0.5)  # debounce delay
                 splash.remove(stick_sprite)  # remove the sprite after a delay
