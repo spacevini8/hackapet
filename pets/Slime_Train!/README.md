@@ -8,3 +8,6 @@
 - Up Button - To Jump or Purchase Items
 - Right Button - Move Right
 - Left Button - Move Left
+
+## PS
+- For some reason I can't use Slack, since the authorizing reaction doesn't work, so please use the email cayoub@bostonk12.org (Any tips to get Slack working would be appreciated as well)
