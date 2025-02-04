@@ -151,8 +151,6 @@ def display_dead():
     bombs.clear()
     strawberries.clear()
     goldberries.clear()
-    timeout_duration = 999999
-    state = 4
 
 # Display the "Game Win" screen
 win = displayio.OnDiskBitmap("RestartWin.bmp")
@@ -179,8 +177,6 @@ def display_end():
     bombs.clear()
     strawberries.clear()
     goldberries.clear()
-    timeout_duration = 999999
-    state = 2
 
 # Game state and controls
 count = 0
@@ -212,6 +208,7 @@ while True:
                     splash.remove(dead)
                 if 'end' in globals():
                     splash.remove(end)
+                count = 0
                 game_over = False
                 state = 0
 
@@ -231,7 +228,6 @@ while True:
     
     if current_time - last_collection_time > timeout_duration:
         state = 0
-        bonnie_sprite[0] = direction + state
 
     # Move bombs and check for collisions
     for bomb in bombs:
@@ -253,6 +249,7 @@ while True:
             splash.remove(strawberry)
             strawberries.remove(strawberry)
         elif check_collision(bonnie_sprite, strawberry):
+            timeout_duration = 2000
             last_collection_time = pygame.time.get_ticks()
             state = 2
             count += 1
@@ -266,6 +263,7 @@ while True:
             splash.remove(goldberry)
             goldberries.remove(goldberry)
         elif check_collision(bonnie_sprite, goldberry):
+            timeout_duration = 2000
             last_collection_time = pygame.time.get_ticks()
             state = 2
             count += 3
@@ -276,6 +274,8 @@ while True:
     if count >= 100:
         count = 100
         progress = 10
+        state = 2
+        timeout_duration = 999999
         game_over = True
         display_end()
     elif count >= 90:
