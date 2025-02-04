@@ -397,13 +397,13 @@ while True:
     # in this game,
     # and Erebus is a moth
 
-    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 30 and score << food_price:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger >= 30 and score >= food_price:
         hunger -= hunger_increment
         score -= food_price
         print ("Hunger: ", hunger)
         print ("Score: ", score)
         ate = True
-    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 30 and score << food_reduced_price:
+    if erebus_sprite.x == 96 and erebus_sprite.y == 64 and hunger >= 1 and ate == False and hunger <= 30 and score >> food_reduced_price:
         hunger = 0
         score -= food_reduced_price
         print ("Hunger: ", hunger)
@@ -619,9 +619,9 @@ while True:
         print("Game Over")
         splash.append(game_over_menu_sprite)
 
-    if score <= 0 and score_overflow_reset_completed == False:
-        score = 0
-        score_overflow_reset_completed = True
+    #if score <= 0 and score_overflow_reset_completed == False:
+        #score = 0
+        #score_overflow_reset_completed = True
 
     if hunger >= 150 and game_over == False:
         game_over = True
