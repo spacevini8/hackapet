@@ -37,8 +37,8 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
 
 pygame.init()
 scale = 1
-#display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
-display=PyGameDisplay(width=128*scale, height=128*scale)
+display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+#display=PyGameDisplay(width=128*scale, height=128*scale)
 splash = displayio.Group(scale=scale)
 
 display.show(splash)
@@ -84,6 +84,18 @@ splash.append(potatoSprite)
 frame = 0
 
 #Dormant, Sprout, Plant, Flowers
+sproutImg = displayio.OnDiskBitmap("sprout.bmp")
+sproutSprite = displayio.TileGrid(
+    sproutImg,
+    pixel_shader=sproutImg.pixel_shader,
+    width=1,
+	height=1,
+	tile_width=32,
+	tile_height=32,
+	default_tile=0,
+	x=(display.width - tile_width) // 2,
+	y=display.height - tile_height - 10
+)
 growthStages = [growthStage(None, 3), growthStage(None, 5), growthStage(None, 10), growthStage(None, 10)]
 
 spud = Potato(10,10,10,10,growthStages)
@@ -150,7 +162,7 @@ while True:
     #add bugs
     if spud.water > (spud.maxWater*0.75) or spud.food > (spud.maxFood*0.75):
         if spud.water > (spud.maxWater*0.75) and spud.food < (spud.maxFood*0.75):
-            tmpChanceOfBug = chanceOfBug/2
+            tmpChanceOfBug = chanceOfBug//2
         else:
             tmpChanceOfBug = chanceOfBug
         if random.randint(0, tmpChanceOfBug) == 0:
@@ -160,7 +172,7 @@ while True:
     
     if spud.water < (spud.maxWater*0.25) or spud.food < (spud.maxFood*0.25):
         if spud.water < (spud.maxWater*0.25) and spud.food < (spud.maxFood*0.25):
-            tmpChanceOfDamg = chanceOfDamg/2
+            tmpChanceOfDamg = chanceOfDamg//2
         else:
             tmpChanceOfDamg = chanceOfDamg
         if random.randint(0, chanceOfDamg) == 0:
@@ -168,7 +180,7 @@ while True:
     
     if spud.bugs > 0:
         if spud.bugs > (spud.maxBugs*0.75):
-            tmpChanceOfDamg = chanceOfDamg/2
+            tmpChanceOfDamg = chanceOfDamg//2
         else:
             tmpChanceOfDamg = chanceOfDamg
         if random.randint(0, chanceOfDamg) == 0:
