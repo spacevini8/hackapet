@@ -151,6 +151,8 @@ def display_dead():
     bombs.clear()
     strawberries.clear()
     goldberries.clear()
+    timeout_duration = 999999
+    state = 4
 
 # Display the "Game Win" screen
 win = displayio.OnDiskBitmap("RestartWin.bmp")
@@ -177,6 +179,8 @@ def display_end():
     bombs.clear()
     strawberries.clear()
     goldberries.clear()
+    timeout_duration = 999999
+    state = 2
 
 # Game state and controls
 count = 0
@@ -204,13 +208,13 @@ while True:
                 bombs.clear()
                 strawberries.clear()
                 goldberries.clear()
-                if 'dead' in globals():
+                if dead in splash:
                     splash.remove(dead)
-                if 'end' in globals():
+                if end in splash:
                     splash.remove(end)
-                count = 0
                 game_over = False
                 state = 0
+                count = 0
 
     keys = pygame.key.get_pressed()
 
@@ -274,8 +278,9 @@ while True:
     if count >= 100:
         count = 100
         progress = 10
-        state = 2
         timeout_duration = 999999
+        last_collection_time = pygame.time.get_ticks()
+        state = 2
         game_over = True
         display_end()
     elif count >= 90:
