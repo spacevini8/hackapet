@@ -233,6 +233,8 @@ splash.append(erebus_sprite)
 
 #here be warnings
 game_over = False
+power_outage = False
+starvation_game_over = False
 menu_open = False
 write_mode = False
 remove_splash = False
@@ -305,16 +307,21 @@ while True:
                 print ("y:", erebus_sprite.y)
                 print ("Hunger: ", hunger)
             elif event.key == pygame.K_UP and game_over == True:
-                splash.remove(game_over_menu_sprite)
-                if score_label in splash:
-                    splash.remove(score_label)
+                if power_outage == True:
+                    splash.remove(game_over_menu_sprite)
+                    power_outage = False
+                if starvation_game_over == True:
+                    splash.remove(starvation_menu_sprite)
+                    starvation_game_over = False
                 game_over = False
                 menu_open = False
+                write_mode = False
+                remove_splash = False
                 game_round = 0
                 score = 10
                 score_increment = 20
                 score_round_increment = 50
-                score_penalty = 30
+                score_penalty = 50
                 score_overflow_reset_completed = False
                 food_price = 15#*round(game_round/2)
                 food_reduced_price = 10
@@ -334,10 +341,12 @@ while True:
                 penalty_AME = False
                 warning_Singulo = False
                 penalty_Singulo = False
-                warning_TEG = False
-                penalty_TEG = False
+                warning_solar = False
+                penalty_solar = False
                 frame = 0
                 speed = 32
+                x=(display.width - tile_width) // 3,
+                y=display.height - tile_height - 0
 
     # side walls
     if erebus_sprite.x < 0:
@@ -606,6 +615,7 @@ while True:
 
     if score <= 0 and game_over == False:
         game_over = True
+        power_outage = True
         print("Game Over")
         splash.append(game_over_menu_sprite)
 
@@ -615,8 +625,19 @@ while True:
 
     if hunger >= 150 and game_over == False:
         game_over = True
+        starvation_game_over = True
         print("Game Over")
         splash.append(starvation_menu_sprite)
+
+    if game_over_menu_sprite in splash and game_over == True:
+        splash.append(game_over_menu_sprite)
+    elif game_over_menu_sprite in splash:
+        splash.remove(game_over_menu_sprite)
+
+    if starvation_menu_sprite in splash and game_over == True:
+        splash.append(starvation_menu_sprite)
+    elif starvation_menu_sprite in splash:
+        splash.remove(starvation_menu_sprite)
 
     score_label.text = f"Score: {score}"
     display.refresh()
