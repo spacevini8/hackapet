@@ -3,7 +3,7 @@ from blinka_displayio_pygamedisplay import PyGameDisplay
 import pygame
 import random
 import time
-
+import ntplib
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 
@@ -15,33 +15,46 @@ display = PyGameDisplay(width=128, height=128, hw_accel=False)
 splash = displayio.Group()
 display.show(splash)
 
-sun_bg_sheet = displayio.OnDiskBitmap("sun_bg.bmp")
+bg_state = "sun_mnt"
 
-sun_bg_sprite = displayio.TileGrid(
-    sun_bg_sheet,
-    pixel_shader=sun_bg_sheet.pixel_shader,
-    width=1,
-    height=1,
-    tile_width=128,
-    tile_height=128,
-    default_tile=0,
-)
+try:
+    c = ntplib.NTPClient()
+    response = c.request("pool.ntp.org")
+    currentHour = time.localtime(response.tx_time).tm_hour
+    if currentHour > 19 or currentHour < 6:
+        bg_state = "night_mnt"
+except:
+    print("No internet")
 
-splash.append(sun_bg_sprite)
+if bg_state == "sun_mnt":
+    sun_bg_sheet = displayio.OnDiskBitmap("sun_bg.bmp")
 
-night_bg_sheet = displayio.OnDiskBitmap("night_bg.bmp")
+    sun_bg_sprite = displayio.TileGrid(
+        sun_bg_sheet,
+        pixel_shader=sun_bg_sheet.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=128,
+        tile_height=128,
+        default_tile=0,
+    )
 
-night_bg_sprite = displayio.TileGrid(
-    night_bg_sheet,
-    pixel_shader=night_bg_sheet.pixel_shader,
-    width=1,
-    height=1,
-    tile_width=128,
-    tile_height=128,
-    default_tile=0,
-)
+    splash.append(sun_bg_sprite)
 
-# splash.append(night_bg_sprite)
+if bg_state == "night_mnt":
+    night_bg_sheet = displayio.OnDiskBitmap("night_bg.bmp")
+
+    night_bg_sprite = displayio.TileGrid(
+        night_bg_sheet,
+        pixel_shader=night_bg_sheet.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=128,
+        tile_height=128,
+        default_tile=0,
+    )
+
+    splash.append(night_bg_sprite)
 
 bear_sheet = displayio.OnDiskBitmap("bear.bmp")
 
@@ -106,7 +119,10 @@ def addFallingObject(type):
 
 
 sun_bg_frame = 0
+night_bg_frame = 0
 bear_frame = 0
+
+night_bg_timer = 0
 
 windowState = "title"
 gameTimer = 0
@@ -122,7 +138,7 @@ while True:
                 windowState = "game"
                 score_text.text = ""
 
-    if gameTimer >= 3:
+    if gameTimer >= 25:
         windowState = "title"
         gameTimer = 0
         for objectType in fallingObjects:
@@ -174,8 +190,14 @@ while True:
                     splash.remove(individual)
                     fallingObjects[objectType].remove(individual)
 
-    sun_bg_sprite[0] = sun_bg_frame
-    sun_bg_frame = (sun_bg_frame + 1) % (sun_bg_sheet.width // 128)
+    if bg_state == "sun_mnt":
+        sun_bg_sprite[0] = sun_bg_frame
+        sun_bg_frame = (sun_bg_frame + 1) % (sun_bg_sheet.width // 128)
+    elif bg_state == "night_mnt":
+        if night_bg_timer % 4 == 0:
+            night_bg_sprite[0] = night_bg_frame
+            night_bg_frame = (night_bg_frame + 1) % (night_bg_sheet.width // 128)
+        night_bg_timer += 1
 
     bear_frame += 1
     if bear_frame % 60 == 0:
