@@ -25,9 +25,10 @@ def load_image(file_path, scale, pos_x, pos_y, w, h, idx):
     screen.blit(cropped_surface, (pos_x, pos_y))
 
 
-def setup_background():
-    background = os.path.join(os.path.dirname(__file__), "art", "background.bmp")
+def setup_background(bg_name):
+    background = os.path.join(os.path.dirname(__file__), "art", bg_name)
     image = pygame.image.load(background)
+    image = pygame.transform.scale(image, (128, 128))
     screen.blit(image, (0, 0))
 
 
@@ -47,7 +48,7 @@ class Pet():
     def __init__(self, stage, animation):
         self.stage = stage
         self.animation = animation
-        self.food = 2
+        self.hunger = 2
         self.progress = 0
         self.eating = False
         self.frame = 0
@@ -137,13 +138,17 @@ class Pet():
         self.bullet_dist = 1
 
     def eat(self):
-        self.food += 1
         # self.frame = 0
         self.eating = True
         # determine stage
         self.animation = ["baby_idle.bmp", 1, 10, 6, False]
         load_image("wood_chips.bmp", 2, 10, 100, 14, 10, 3)
         self.progress = 0
+        self.hunger -= 1
+
+    def sad_screen(self):
+        self.animation = ["sad_screen" + str(int(self.progress / 8)+1)
+                              + ".bmp", 0, 32, 32, False]
 
 class Icon():
     def __init__(self):
@@ -208,25 +213,41 @@ led_states = [False, False, False]
 # Main game loop
 blob = Pet(0, ["egg_wait.bmp", 1, 10, 8, True])
 handler = Event_handler(True)
-running = True
 clock = pygame.time.Clock()
 
 while handler.running:
     handler.handle_events()
     check_keys()
-    setup_background()
+    if blob.teaching:
+        setup_background("training_bg.bmp")
+    elif blob.eating:
+        setup_background("eating_bg.bmp")
+    else:
+        setup_background("background.bmp")
 
     # handle blob animations
+
+
     if blob.animation[0] != "":
         if blob.frame > blob.animation[1]:
             blob.frame = 0
             if not blob.animation[4]:
                 blob.next_animation()
-    load_image(blob.animation[0], 4, 40, 90, blob.animation[2],
-               blob.animation[3], blob.frame)
+    if int(blob.hunger) >= 4:
+        blob.sad_screen()
+        blob.progress += 1
+        if blob.progress > 15:
+            handler.running = False
+    if blob.hunger > 4:
+        load_image(blob.animation[0], 4, 0, 0, blob.animation[2],
+                   blob.animation[3], blob.frame)
+    else:
+        load_image(blob.animation[0], 4, 45, 95, blob.animation[2],
+                   blob.animation[3], blob.frame)
     blob.frame += 1
 
     # handle blob activities
+
     if blob.eating:
         load_image("wood_chips.bmp", 2, 10, 100, 14, 10, blob.progress)
     if blob.teaching:
@@ -241,14 +262,24 @@ while handler.running:
             else:
                 blob.bullet_dist -= 1
         else:
-            load_image(blob.plant[0], 3, 10, 64, blob.plant[3],
+            load_image(blob.plant[0], 3, 10, 63, blob.plant[3],
                        blob.plant[4], blob.plant[1])
             load_image("goo_bullet" + str(blob.bullet_dir)
                        + ".bmp", 2, blob.bullet_dist, 80, 6, 3, 0)
+    blob.hunger += 0.01
 
 
-    # show selected icon
+    # show selected icon & stats
     load_image(icon.namelist[icon.name] + "_icon.bmp", 2, 5, 5, 8, 8, 0)
+    if not blob.teaching or blob.eating:
+        load_image(icon.namelist[icon.name] + ".bmp", 2, 83, 5, 8, 8, 0)
+        if icon.name == 0:
+            load_image("level.bmp", 4, 100, 5, 6, 4, int(blob.hunger))
+        else:
+            load_image("level.bmp", 4, 100, 5, 6, 4, 3 - int(blob.skill))
+
+    if blob.hunger >= 3:
+        load_image("hunger_warn.bmp", 4, 0, 96, 32, 8, 0)
 
     # Draw buttons
     # for button, color in zip(buttons, button_colors):
