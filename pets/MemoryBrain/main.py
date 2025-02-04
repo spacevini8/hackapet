@@ -22,6 +22,9 @@ rightArr = displayio.OnDiskBitmap("rightArr.bmp")
 bg_sprite = displayio.TileGrid(lab_background, pixel_shader=lab_background.pixel_shader)
 splash.append(bg_sprite)
 
+start_screen = displayio.OnDiskBitmap("start.bmp") 
+
+
 brain_sprite = displayio.TileGrid(
     brain_sheet,
     pixel_shader=brain_sheet.pixel_shader,
@@ -57,17 +60,31 @@ for direction, (x, y) in arrow_positions.items():
     splash.append(arrow)
     i+=1
 
+
+start_sign = displayio.TileGrid(
+    start_screen,
+    pixel_shader=start_screen.pixel_shader,
+    width=21,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    x=0,
+    y=0
+)
+splash.append(start_sign)
+
+
 sequence = []
 player_input = []
 waiting_for_input = False
-game_over = False
+game_state = "start"  
 death_sign = None
 
 def blink_arrow(direction):
     arrow = arrows[direction]
     splash.remove(arrow)
     time.sleep(0.15)  
-    splash.append(arrow)
+    splash.insert(2,arrow)
     time.sleep(0.15)  
     
 def blink_brain():
@@ -113,41 +130,61 @@ def play_sequence():
     pygame.event.clear()
     pygame.event.set_allowed(pygame.KEYDOWN)
 
+
+
+current_frame_start=0;
 def display_game_over():
     global death_sign
-    death = displayio.OnDiskBitmap("restart.bmp")
+    death = displayio.OnDiskBitmap("restart2.bmp")
     death_sign = displayio.TileGrid(
         death,
         pixel_shader=death.pixel_shader,
-        width=1,
+        width=8,
         height=1,
-        tile_width=64,
-        tile_height=32,
-        x=(display.width - 64) // 2,
-        y=(display.height - 32) // 2 
+        tile_width=128,
+        tile_height=128,
+        x=0,
+        y=0 
+        
     )
     splash.append(death_sign)
-frame = 0
+    for k in range(8):
+        death_sign[0] = k  
+        time.sleep(.1)
 
+def display_start():
+    global current_frame_start
+    current_frame_start = (current_frame_start + 1) % 21
+    start_sign[0] = current_frame_start  
+    time.sleep(.1)
 
-
+waiting_for_input=False
 while True:
+    if game_state == "start":
+        display_start()
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
         if event.type == pygame.KEYDOWN:
-            if game_over==True and event.key == pygame.K_DOWN:
+            if game_state == "start" and event.key == pygame.K_DOWN:
+                splash.remove(start_sign)  # Hide start screen
+                game_state = "playing"
+                sequence.append(random.choice(list(arrows.keys())))  # Initial sequence
+                play_sequence()
+            
+            elif game_state == "game_over" and event.key == pygame.K_DOWN:
                 splash.remove(death_sign)  
                 sequence.clear()  
                 player_input.clear()
-                game_over = False
+                game_state = "playing"
                 waiting_for_input = False
                 sequence.append(random.choice(list(arrows.keys())))
                 play_sequence()
                 continue
             
-            elif event.key in [pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT] and waiting_for_input and game_over==False:
+            elif event.key in [pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT] and waiting_for_input and game_state == "playing":
                 if event.key == pygame.K_DOWN:
                     player_input.append("DOWN")
                     blink_brain_thread = threading.Thread(target=blink_brain, daemon=True)
@@ -163,15 +200,15 @@ while True:
 
                 blink_brain_thread.start()
                 blink_arrow_thread.start()
-            if player_input != sequence[:len(player_input)] and game_over==False:
-                game_over=True
+            if player_input != sequence[:len(player_input)] and game_state == "playing":
+                game_state = "game_over"
                 display_game_over()
             elif len(player_input) == len(sequence):
                 waiting_for_input = False
                 player_input.clear()
                 sequence.append(random.choice(list(arrows.keys())))
                 play_sequence()
-    if not game_over and not waiting_for_input:
+    if game_state == "playing" and not waiting_for_input:
         sequence.append(random.choice(list(arrows.keys())))
         play_sequence()
     
