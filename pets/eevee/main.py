@@ -119,7 +119,7 @@ def check_collision(sprite1, sprite2):
         sprite1.y + 32 > sprite2.y
     )
 
-restart = displayio.OnDiskBitmap("restart.bmp")
+restart = displayio.OnDiskBitmap("sprites/restart.bmp")
 
 def display_death():
     global death
@@ -143,7 +143,7 @@ def display_death():
     biscuits.clear()
 
 frame = 0
-speed = 4
+speed = 5
 game_over = False
 
 while True:
@@ -168,13 +168,13 @@ while True:
             eevee_sprite.x -= speed
         if keys[pygame.K_RIGHT]:
             eevee_sprite.x += speed
-        if random.random() < 0.028:  # spawn rate
+        if random.random() < 0.026:  # spawn rate
             spawn_fireball()
-        if random.random() < 0.022:
+        if random.random() < 0.025:
             spawn_electric()
-        if random.random() < 0.022:
+        if random.random() < 0.025:
             spawn_water()
-        if random.random() < 0.022:
+        if random.random() < 0.025:
             spawn_fire()
 
     for fireball in fireballs:
