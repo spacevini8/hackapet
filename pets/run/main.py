@@ -36,6 +36,8 @@ restart_text = label.Label(font=font4, text="SPACE TO RESTART", x=15, y=65)
 game_title_text = label.Label(font=font10, text="RUN", x=37, y=50)
 start_text = label.Label(font=font4, text="SPACE TO START", x=20, y=70)
 
+score_text = label.Label(font=font6, text="0", x=10, y=10)
+
 # Player setup
 player = displayio.TileGrid(
     player_sprite,
@@ -66,6 +68,7 @@ main_group.append(bg2)
 game_group.append(player)
 game_group.append(enemy_group)
 main_group.append(main_menu_group)
+main_group.append(score_text)
 main_group.append(game_group)
 main_group.append(game_over_group)
 
@@ -81,6 +84,8 @@ player_lane = 2
 enemy_speed = 5
 enemy_spawn_interval = 1.4
 last_enemy_spawn_time = time.time() + 1
+score = 0
+start_time = time.time()
 
 # Helper functions
 def get_enemy_lanes():
@@ -106,7 +111,7 @@ def get_player_x_by_lane():
         return 100
 
 def reset_game():
-    global player_lane, enemy_group, last_enemy_spawn_time, enemy_spawn_interval
+    global start_time, score, player_lane, enemy_group, last_enemy_spawn_time, enemy_spawn_interval
     player_lane = 2
     player.x = get_player_x_by_lane()
     game_group.remove(enemy_group)
@@ -114,9 +119,12 @@ def reset_game():
     game_group.append(enemy_group)
     last_enemy_spawn_time = time.time() + 1
     enemy_spawn_interval = 1.4
+    score = 0
+    start_time = time.time()
 
 # Main game loop
 while True:
+    score_text.text = str(int(score))
     # Scroll background
     bg1.y += bg_scroll_speed
     bg2.y += bg_scroll_speed
@@ -156,6 +164,9 @@ while True:
                     current_state = MENU
 
     if current_state == PLAYING:
+        score = time.time() - start_time
+
+        score_text.hidden = False
         game_over_group.hidden = True
         main_menu_group.hidden = True
         game_group.hidden = False
@@ -192,11 +203,13 @@ while True:
         enemy_frame = (enemy_frame + 1) % enemy_frame_count
 
     elif current_state == MENU:
+        score_text.hidden = True
         game_over_group.hidden = True
         main_menu_group.hidden = False
         game_group.hidden = True
 
     elif current_state == GAME_OVER:
+        score_text.hidden = False
         game_over_group.hidden = False
         main_menu_group.hidden = True
         game_group.hidden = True
