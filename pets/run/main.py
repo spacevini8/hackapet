@@ -33,8 +33,8 @@ bg2 = displayio.TileGrid(bg_sprite, pixel_shader=bg_sprite.pixel_shader, x=0, y=
 game_over_text = label.Label(font=font6, text="GAME OVER!", x=10, y=50)
 restart_text = label.Label(font=font4, text="SPACE TO RESTART", x=15, y=65)
 
-game_title_text = label.Label(font=font10, text="RUN", x=20, y=50)
-start_text = label.Label(font=font4, text="SPACE TO START", x=15, y=65)
+game_title_text = label.Label(font=font10, text="RUN", x=37, y=50)
+start_text = label.Label(font=font4, text="SPACE TO START", x=20, y=70)
 
 # Player setup
 player = displayio.TileGrid(
