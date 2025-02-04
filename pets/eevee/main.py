@@ -11,12 +11,9 @@ display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
 
-# house = displayio.OnDiskBitmap("sprites/house.bmp")
-# bg_sprite = displayio.TileGrid(house, pixel_shader=house.pixel_shader)
-# splash.append(bg_sprite)
-
+# Background sprite
 bg_sheet = displayio.OnDiskBitmap("sprites/home.bmp")
-bg_sprite= displayio.TileGrid(
+bg_sprite = displayio.TileGrid(
     bg_sheet,
     pixel_shader=bg_sheet.pixel_shader,
     width=1,
@@ -29,29 +26,30 @@ bg_sprite= displayio.TileGrid(
     )
 splash.append(bg_sprite)
 
+# Eevee sprite
 eevee_sheet = displayio.OnDiskBitmap("sprites/EeveeIdle.bmp")
-
-tile_width = 32
-tile_height = 32
-
 eevee_sprite = displayio.TileGrid(
     eevee_sheet,
     pixel_shader=eevee_sheet.pixel_shader,
     width=1,
     height=1,
-    tile_width=tile_width,
-    tile_height=tile_height,
+    tile_width=32,
+    tile_height=32,
     default_tile=0,
-    x=(display.width - tile_width) // 2,  
-    y=display.height - tile_height - 10     
+    x=(display.width - 32) // 2,  
+    y=display.height - 32 - 10     
 )
-
 splash.append(eevee_sprite)
+
+# Biscuits
+electric = displayio.OnDiskBitmap("sprites/biscuits/electric.bmp")
+fire = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
+water = displayio.OnDiskBitmap("sprites/biscuits/water.bmp")
+biscuits = [electric, fire, water]
 
 fireball_bitmap = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
 
 fireballs = []
-
 def spawn_fireball():
     x_position = random.randint(0, display.width - fireball_bitmap.width)
     fireball = displayio.TileGrid(
@@ -76,12 +74,12 @@ def check_collision(sprite1, sprite2):
         sprite1.y + 32 > sprite2.y
     )
 
-death = displayio.OnDiskBitmap("restart.bmp")
+sparkle = displayio.OnDiskBitmap("restart.bmp")
 
-def display_game_over():
-    global death_hi
-    death_hi = displayio.TileGrid(
-        death,
+def display_evolve():
+    global evolution
+    evolution = displayio.TileGrid(
+        sparkle,
         pixel_shader=eevee_sheet.pixel_shader,
         width=1,
         height=1,
@@ -91,7 +89,7 @@ def display_game_over():
         x=(display.width - 64) // 2,  
         y=(display.height - 32) // 2  
     )
-    splash.append(death_hi)
+    splash.append(evolution)
     for i in fireballs:
         splash.remove(i)
     fireballs.clear()
@@ -111,7 +109,7 @@ while True:
                 for i in fireballs:
                     splash.remove(i)
                 fireballs.clear()
-                splash.remove(death_hi)
+                splash.remove(evolution)
                 game_over = False
 
 
@@ -132,7 +130,7 @@ while True:
             fireballs.remove(fireball)
         elif check_collision(eevee_sprite, fireball):
             game_over = True
-            display_game_over()
+            display_evolve()
 
     eevee_sprite[0] = frame
     frame = (frame + 1) % 4
@@ -140,4 +138,4 @@ while True:
     bg_sprite[0] = frame
     frames = (frame + 1) % 4
 
-    time.sleep(0.1)
+    time.sleep(0.12)
