@@ -37,8 +37,8 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
 
 pygame.init()
 scale = 1
-#display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
-display=PyGameDisplay(width=128*scale, height=128*scale)
+display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+#display=PyGameDisplay(width=128*scale, height=128*scale)
 splash = displayio.Group(scale=scale)
 
 display.show(splash)
@@ -103,10 +103,10 @@ spud = Potato(10,10,10,10,growthStages)
 
 
 
-waterOutline = Rect(10,10,32,4,outline=0xFFFFFF)
-foodOutline = Rect(10,16,32,4,outline=0xFFFFFF)
-bugOutline = Rect(10,22,32,4,outline=0xFFFFFF)
-healthOutline = Rect(10,28,32,4,outline=0xFFFFFF)
+waterOutline = Rect(10,10,32,6,outline=0x0)
+foodOutline = Rect(10,18,32,6,outline=0x0)
+bugOutline = Rect(10,26,32,6,outline=0x0)
+healthOutline = Rect(10,34,32,6,outline=0x0)
 
 waterBar = updateBar(splash, None, waterOutline,spud.water,spud.maxWater,0x0000FF)
 foodBar = updateBar(splash, None, foodOutline, spud.food, spud.maxFood, 0xDAA06D)
@@ -116,6 +116,7 @@ healthBar = updateBar(splash, None, healthOutline, spud.health, spud.maxHealth, 
 splash.append(waterOutline)
 splash.append(foodOutline)
 splash.append(bugOutline)
+splash.append(healthOutline)
 
 while True:
 
