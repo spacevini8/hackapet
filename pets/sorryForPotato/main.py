@@ -37,8 +37,8 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
 
 pygame.init()
 scale = 1
-display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
-#display=PyGameDisplay(width=128*scale, height=128*scale)
+#display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
+display=PyGameDisplay(width=128*scale, height=128*scale)
 splash = displayio.Group(scale=scale)
 
 display.show(splash)
@@ -54,7 +54,7 @@ splash.append(bgrSprite)
 
 tile_width=32
 tile_height=32
-potatoImage = displayio.OnDiskBitmap("Potato.bmp")
+potatoImage = displayio.OnDiskBitmap("PotatoVer3.bmp")
 deadPotatoImage = displayio.OnDiskBitmap("PotatoDead2.bmp")
 potatoSprite = displayio.TileGrid(
     potatoImage,
@@ -82,20 +82,21 @@ deadPotatoSprite = displayio.TileGrid(
 splash.append(potatoSprite)
 
 frame = 0
+trueFrame = 0
 
 #Dormant, Sprout, Plant, Flowers
-sproutImg = displayio.OnDiskBitmap("sprout.bmp")
-sproutSprite = displayio.TileGrid(
-    sproutImg,
-    pixel_shader=sproutImg.pixel_shader,
-    width=1,
-	height=1,
-	tile_width=32,
-	tile_height=32,
-	default_tile=0,
-	x=(display.width - tile_width) // 2,
-	y=display.height - tile_height - 10
-)
+# sproutImg = displayio.OnDiskBitmap("sprout.bmp")
+# sproutSprite = displayio.TileGrid(
+#     sproutImg,
+#     pixel_shader=sproutImg.pixel_shader,
+#     width=1,
+# 	height=1,
+# 	tile_width=32,
+# 	tile_height=32,
+# 	default_tile=0,
+# 	x=(display.width - tile_width) // 2,
+# 	y=display.height - tile_height - 10
+# )
 growthStages = [growthStage(None, 3), growthStage(None, 5), growthStage(None, 10), growthStage(None, 10)]
 
 spud = Potato(10,10,10,10,growthStages)
@@ -223,8 +224,8 @@ while True:
     bugBar = updateBar(splash, bugBar, bugOutline, spud.bugs, spud.maxBugs, 0x94b21c)
     healthBar = updateBar(splash, healthBar, healthOutline, spud.health, spud.maxHealth, 0xFF0000)
 
-    
-    
-    potatoSprite[0] = (frame + 1) % (potatoImage.width // tile_width)
+    potatoSprite[0] = frame
+    trueFrame = (trueFrame + 0.05) % ((potatoImage.width // tile_width)-1)
+    frame = round(trueFrame)
 
     time.sleep(0.01)
