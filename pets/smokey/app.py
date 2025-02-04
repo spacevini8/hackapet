@@ -1,0 +1,188 @@
+import displayio
+from blinka_displayio_pygamedisplay import PyGameDisplay
+import pygame
+import random
+import time
+
+from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text import label
+
+pygame.init()
+
+# hw_accel=False
+# Set to disabled if on Linux using https://github.com/CyrilSLi/Blinka_Displayio_PyGameDisplay
+display = PyGameDisplay(width=128, height=128, hw_accel=False)
+splash = displayio.Group()
+display.show(splash)
+
+sun_bg_sheet = displayio.OnDiskBitmap("sun_bg.bmp")
+
+sun_bg_sprite = displayio.TileGrid(
+    sun_bg_sheet,
+    pixel_shader=sun_bg_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+)
+
+splash.append(sun_bg_sprite)
+
+night_bg_sheet = displayio.OnDiskBitmap("night_bg.bmp")
+
+night_bg_sprite = displayio.TileGrid(
+    night_bg_sheet,
+    pixel_shader=night_bg_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+)
+
+# splash.append(night_bg_sprite)
+
+bear_sheet = displayio.OnDiskBitmap("bear.bmp")
+
+bear_sprite = displayio.TileGrid(
+    bear_sheet,
+    pixel_shader=bear_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=32,
+    tile_height=32,
+    default_tile=0,
+    x=int((display.width / 2)) - 16,
+    y=display.height - 32,
+)
+
+splash.append(bear_sprite)
+
+score_text = label.Label(
+    bitmap_font.load_font("font.bdf"),
+    text="Start",
+    color=0x0000FF,
+    y=int(display.height / 2),
+    x=20,
+)
+
+splash.append(score_text)
+
+bomb_sheet = displayio.OnDiskBitmap("bomb.bmp")
+blueberry_sheet = displayio.OnDiskBitmap("blueberry.bmp")
+acorn_sheet = displayio.OnDiskBitmap("acorn.bmp")
+fish_sheet = displayio.OnDiskBitmap("fish.bmp")
+
+fallingObjects = {
+    "bomb": [],
+    "blueberry": [],
+    "acorn": [],
+    "fish": [],
+}
+
+
+def addFallingObject(type):
+    bitmaps = {
+        "bomb": bomb_sheet,
+        "blueberry": blueberry_sheet,
+        "acorn": acorn_sheet,
+        "fish": fish_sheet,
+    }
+    bitmap = bitmaps[type]
+    x_position = random.randint(0, display.width - bitmap.width)
+    display_object = displayio.TileGrid(
+        bitmap,
+        pixel_shader=bitmap.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=bitmap.width,
+        tile_height=bitmap.height,
+        x=x_position,
+        y=bitmap.height * -1,
+    )
+    fallingObjects[type].append(display_object)
+    splash.append(display_object)
+
+
+sun_bg_frame = 0
+bear_frame = 0
+
+windowState = "title"
+gameTimer = 0
+score = 0
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and windowState == "title":
+                windowState = "game"
+                score_text.text = ""
+
+    if gameTimer >= 3:
+        windowState = "title"
+        gameTimer = 0
+        for objectType in fallingObjects:
+            for individual in fallingObjects[objectType]:
+                splash.remove(individual)
+                fallingObjects[objectType].remove(individual)
+        bear_sprite.x = int((display.width / 2)) - 16
+        bear_sprite.y = display.height - 32
+        score_text.text = str(score)
+
+    keys = pygame.key.get_pressed()
+
+    if windowState == "game":
+        if keys[pygame.K_LEFT]:
+            if bear_sprite.x != -16:
+                bear_sprite.x -= 4
+        if keys[pygame.K_RIGHT]:
+            if bear_sprite.x != (display.width - 16):
+                bear_sprite.x += 4
+        tickChance = random.random()
+        if tickChance < 0.025:
+            addFallingObject("fish")
+        elif tickChance < 0.05:
+            addFallingObject("blueberry")
+        elif tickChance < 0.075:
+            addFallingObject("acorn")
+        elif tickChance < 0.1:
+            addFallingObject("bomb")
+        for objectType in fallingObjects:
+            for individual in fallingObjects[objectType]:
+                individual.y += 5
+                if individual.y > display.height:
+                    splash.remove(individual)
+                    fallingObjects[objectType].remove(individual)
+                elif (
+                    individual.x < bear_sprite.x + 32
+                    and individual.x + 32 > bear_sprite.x
+                    and individual.y < bear_sprite.y + 32
+                    and individual.y + 32 > bear_sprite.y
+                ):
+                    if objectType == "bomb":
+                        score -= 4
+                    elif objectType == "fish":
+                        score += 2
+                    elif objectType == "acorn":
+                        score += 4
+                    elif objectType == "blueberry":
+                        score += 6
+                    splash.remove(individual)
+                    fallingObjects[objectType].remove(individual)
+
+    sun_bg_sprite[0] = sun_bg_frame
+    sun_bg_frame = (sun_bg_frame + 1) % (sun_bg_sheet.width // 128)
+
+    bear_frame += 1
+    if bear_frame % 60 == 0:
+        bear_sprite[0] = 1
+    else:
+        bear_sprite[0] = 0
+
+    if windowState == "game":
+        gameTimer += 0.1
+    time.sleep(0.1)
