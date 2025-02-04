@@ -1,5 +1,5 @@
 # Stackacat
-A game about stacking cats, where you infinitely stack cats.
+A game about stacking cats, where you stack cats to the sky, beware tho your cat might fall!! 
 
 ![game](https://i.imgur.com/WBF5wE1.png)
 
