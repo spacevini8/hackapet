@@ -39,11 +39,11 @@ pygame.init()
 scale = 1
 display=PyGameDisplay(width=128*scale, height=128*scale,hw_accel=False)
 #display=PyGameDisplay(width=128*scale, height=128*scale)
-splash = displayio.Group(scale=scale)
 
+splash = displayio.Group(scale=scale)
 display.show(splash)
 
-bgrImage = displayio.OnDiskBitmap("background.bmp")
+bgrImage = displayio.OnDiskBitmap("backgroundVer2.bmp")
 bgrSprite = displayio.TileGrid(bgrImage,pixel_shader=bgrImage.pixel_shader)
 
 font = bitmap_font.load_font("helvR12.bdf")
@@ -226,7 +226,7 @@ while True:
     healthBar = updateBar(splash, healthBar, healthOutline, spud.health, spud.maxHealth, 0xFF0000)
 
     potatoSprite[0] = frame
-    trueFrame = (trueFrame + 0.05) % ((potatoImage.width // tile_width)-1)
+    trueFrame = (trueFrame + 0.03) % ((potatoImage.width // tile_width)-2)
     frame = round(trueFrame)
 
     time.sleep(0.01)
