@@ -78,6 +78,8 @@ fruit_bitmap = displayio.OnDiskBitmap("burger.bmp")
 
 fruits = []
 
+disabledfruits = []
+
 
 def spawnfruit(lane):
     lanes = [0, display.width // 3, 2 * display.width // 3]  # Define 3 lanes
@@ -96,6 +98,20 @@ def spawnfruit(lane):
     splash.append(fruit)
 
 
+combofruit = displayio.TileGrid(
+    fruit_bitmap,
+    pixel_shader=fruit_bitmap.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=fruit_bitmap.width,
+    tile_height=fruit_bitmap.height,
+    x=32,
+    y=display.height - (tile_height * 2),
+)
+
+splash.append(combofruit)
+
+
 # Function to check for collisions
 def check_collision(sprite1, sprite2):
     return (
@@ -110,6 +126,7 @@ frame = 0
 speed = 8
 game_over = False
 started = False
+combo = False
 
 score = 0
 start_time = time.time()
@@ -173,6 +190,11 @@ while True:
             pygame.quit()
             exit()
 
+    if combo:
+        combofruit.x = cat_sprite.x
+    else:
+        combofruit.x = -32
+
     keys = pygame.key.get_pressed()
 
     if not started and keys[pygame.K_x]:
@@ -205,10 +227,26 @@ while True:
         if fruit.y > display.height:
             splash.remove(fruit)
             fruits.remove(fruit)
-        elif check_collision(cat_sprite, fruit):
+        elif fruit.y > (display.height - 64):
+            if fruit in disabledfruits:
+                continue
+            disabledfruits.append(fruit)
+            combo = False
+        elif check_collision(combofruit, fruit):
+            if fruit in disabledfruits:
+                continue
             splash.remove(fruit)
             fruits.remove(fruit)
             score += 1
+            combo = True
+            text_area.text = f"Score: {score}"
+        elif check_collision(cat_sprite, fruit):
+            if fruit in disabledfruits:
+                continue
+            splash.remove(fruit)
+            fruits.remove(fruit)
+            score += 1
+            combo = True
             text_area.text = f"Score: {score}"
 
     cat_sprite[0] = frame
