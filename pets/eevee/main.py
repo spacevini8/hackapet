@@ -41,15 +41,15 @@ eevee_sprite = displayio.TileGrid(
 )
 splash.append(eevee_sprite)
 
-# Biscuits
-electric = displayio.OnDiskBitmap("sprites/biscuits/electric.bmp")
-fire = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
-water = displayio.OnDiskBitmap("sprites/biscuits/water.bmp")
-biscuits = [electric, fire, water]
-
-fireball_bitmap = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
+# Dropping objects
+electric_bitmap = displayio.OnDiskBitmap("sprites/biscuits/electric.bmp")
+fire_bitmap = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
+water_bitmap = displayio.OnDiskBitmap("sprites/biscuits/water.bmp")
+fireball_bitmap = displayio.OnDiskBitmap("sprites/chocolate.bmp")
 
 fireballs = []
+biscuits = []
+
 def spawn_fireball():
     x_position = random.randint(0, display.width - fireball_bitmap.width)
     fireball = displayio.TileGrid(
@@ -65,6 +65,51 @@ def spawn_fireball():
     fireballs.append(fireball)
     splash.append(fireball)
 
+def spawn_electric():
+    x_position = random.randint(0, display.width - electric_bitmap.width)
+    electric = displayio.TileGrid(
+        electric_bitmap,
+        pixel_shader=electric_bitmap.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=electric_bitmap.width,
+        tile_height=electric_bitmap.height,
+        x=x_position,
+        y=-32
+    )
+    biscuits.append(electric)
+    splash.append(electric)
+
+def spawn_water():
+    x_position = random.randint(0, display.width - water_bitmap.width)
+    water = displayio.TileGrid(
+        water_bitmap,
+        pixel_shader=water_bitmap.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=water_bitmap.width,
+        tile_height=water_bitmap.height,
+        x=x_position,
+        y=-32
+    )
+    biscuits.append(water)
+    splash.append(water)
+
+def spawn_fire():
+    x_position = random.randint(0, display.width - fire_bitmap.width)
+    fire = displayio.TileGrid(
+        fire_bitmap,
+        pixel_shader=fire_bitmap.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=fire_bitmap.width,
+        tile_height=fire_bitmap.height,
+        x=x_position,
+        y=-32
+    )
+    biscuits.append(fire)
+    splash.append(fire)
+
 # Function to check for collisions
 def check_collision(sprite1, sprite2):
     return (
@@ -74,12 +119,12 @@ def check_collision(sprite1, sprite2):
         sprite1.y + 32 > sprite2.y
     )
 
-sparkle = displayio.OnDiskBitmap("restart.bmp")
+restart = displayio.OnDiskBitmap("restart.bmp")
 
-def display_evolve():
-    global evolution
-    evolution = displayio.TileGrid(
-        sparkle,
+def display_death():
+    global death
+    death = displayio.TileGrid(
+        restart,
         pixel_shader=eevee_sheet.pixel_shader,
         width=1,
         height=1,
@@ -89,10 +134,13 @@ def display_evolve():
         x=(display.width - 64) // 2,  
         y=(display.height - 32) // 2  
     )
-    splash.append(evolution)
+    splash.append(death)
     for i in fireballs:
         splash.remove(i)
     fireballs.clear()
+    for i in biscuits:
+        splash.remove(i)
+    biscuits.clear()
 
 frame = 0
 speed = 4
@@ -109,7 +157,7 @@ while True:
                 for i in fireballs:
                     splash.remove(i)
                 fireballs.clear()
-                splash.remove(evolution)
+                splash.remove(death)
                 game_over = False
 
 
@@ -120,8 +168,14 @@ while True:
             eevee_sprite.x -= speed
         if keys[pygame.K_RIGHT]:
             eevee_sprite.x += speed
-        if random.random() < 0.025:  # spawn rate
+        if random.random() < 0.028:  # spawn rate
             spawn_fireball()
+        if random.random() < 0.022:
+            spawn_electric()
+        if random.random() < 0.022:
+            spawn_water()
+        if random.random() < 0.022:
+            spawn_fire()
 
     for fireball in fireballs:
         fireball.y += 5 
@@ -130,7 +184,35 @@ while True:
             fireballs.remove(fireball)
         elif check_collision(eevee_sprite, fireball):
             game_over = True
-            display_evolve()
+            display_death()
+
+    for electric in biscuits:
+        electric.y += 3 
+        if electric.y > display.height:
+            splash.remove(electric)
+            biscuits.remove(electric)
+        elif check_collision(eevee_sprite, electric):
+            splash.remove(electric)
+            biscuits.remove(electric)
+
+    for water in biscuits:
+        water.y += 3 
+        if water.y > display.height:
+            splash.remove(water)
+            biscuits.remove(water)
+        elif check_collision(eevee_sprite, water):
+            splash.remove(water)
+            biscuits.remove(water)
+
+
+    for fire in biscuits:
+        fire.y += 3 
+        if fire.y > display.height:
+            splash.remove(fire)
+            biscuits.remove(fire)
+        elif check_collision(eevee_sprite, fire):
+            splash.remove(fire)
+            biscuits.remove(fire)
 
     eevee_sprite[0] = frame
     frame = (frame + 1) % 4
