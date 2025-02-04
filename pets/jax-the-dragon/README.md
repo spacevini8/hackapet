@@ -23,13 +23,17 @@ Jax is a Bearded Dragon who lives in the Australian Outback.
   
 ### Gameplay
 
-You play as Jax, a Bearded Dragon in the Australian Outback. 
-You must collect falling water drops to avoid becoming dehydrated. 
-Your health will decrease without water until you eventually die.
+- You play as Jax, a Bearded Dragon in the Australian Outback. 
+
+- You must collect falling water drops to avoid becoming dehydrated. 
+
+- Your health will decrease without water until you eventually die.
+
+- When your health drops below 40, Jax will become sad, and sweat will begin to drip from his forehead (_he is very dehydrated_)
 
 ### Demo
 
-[![Demo Video](https://cloud-cyzv9gb2b-hack-club-bot.vercel.app/0screenshot_2025-01-31_at_10.54.56___am.png)](https://cloud-2zovn75op-hack-club-bot.vercel.app/0screen_recording_2025-01-31_at_3.20.51___pm.mp4)
+[![Demo Video](https://cloud-cyzv9gb2b-hack-club-bot.vercel.app/0screenshot_2025-01-31_at_10.54.56___am.png)](https://youtu.be/odqx-JzUDgA)
 
 
 @esemv on Slack
