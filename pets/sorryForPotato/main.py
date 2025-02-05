@@ -33,7 +33,24 @@ def updateBar(splash, bar, maxBar, thing, maxThing, color):
     bar = Rect(maxBar.x,maxBar.y,round((maxBar.width/maxThing)*thing),maxBar.height,fill=color)
     splash.append(bar)
     return bar
+
+def spawnBug(splash, display, bugImage, bugs):
+    x = random.randint(0, display.width-bugImage.width)
+    y = random.randint(38, display.height - bugImage.height)
     
+    bug = displayio.TileGrid(
+        bugImage,
+        pixel_shader=bugImage.pixel_shader,
+        width=1,
+        height=1,
+        tile_width=bugImage.width,
+        tile_height=bugImage.height,
+        x=x,
+        y=y
+    )
+
+    bugs.append(bug)
+    splash.append(bug)
 
 pygame.init()
 scale = 1
@@ -80,6 +97,9 @@ deadPotatoSprite = displayio.TileGrid(
 )
 
 splash.append(potatoSprite)
+
+bugImage = displayio.OnDiskBitmap("bug.bmp")
+bugs = []
 
 frame = 0
 trueFrame = 0
@@ -136,17 +156,17 @@ while True:
                     spud.water+= waterIncrese
                     if spud.water > spud.maxWater:
                         spud.water = spud.maxWater
-                    print(spud.water)
                 if event.key == pygame.K_2:
                     spud.food += foodIncrese
                     if spud.food > spud.maxFood:
                         spud.food = spud.maxFood
-                    print(spud.food)
                 if event.key == pygame.K_3:
                     spud.bugs -= bugDecrese
                     if spud.bugs < 0:
                         spud.bugs = 0
-                    print(spud.bugs)
+                    else:
+                        splash.remove(bugs[0])
+                        bugs.pop(0)
     if spud.alive == False:
         continue
     
@@ -171,6 +191,8 @@ while True:
             spud.bugs+=1
             if spud.bugs > spud.maxBugs:
                 spud.bugs = spud.maxBugs
+            else:
+                spawnBug(splash, display, bugImage, bugs)
     
     if spud.water < (spud.maxWater*0.25) or spud.food < (spud.maxFood*0.25):
         if spud.water < (spud.maxWater*0.25) and spud.food < (spud.maxFood*0.25):
