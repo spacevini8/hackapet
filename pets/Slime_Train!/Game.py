@@ -102,7 +102,7 @@ Pet.y = display.height - 16 - Pet.tile_height
 Merchant_Price = 25
 Witch_Merchant_Price = 50
 #Slime_Anim_Sheet.width // Pet.tile_width
-Gold=100000
+Gold=0
 Gold_Speed=1
 
 
