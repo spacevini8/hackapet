@@ -1,4 +1,6 @@
-''' for now, use left and right arrow keys to move the player, B to kick the ball, C to end game'''
+''' for now, use left and right arrow keys to move the player'''
+'''A to restart game, B to kick the ball, C to end game'''
+
 import pygame
 import time
 import random
@@ -27,21 +29,33 @@ gk_imgs = [load_img("goalkeeper_idle.bmp"), load_img("goalkeeper_hands_up.bmp")]
 fb_imgs = [load_img("football_1.bmp"), load_img("football_2.bmp")]
 gp_img = load_img("goalpost.bmp")
 
-p_x, p_y = 10, 80
-gk_x, gk_y = 50, 30
-gp_x, gp_y = 32, 10
-fb_x, fb_y = 40, 90
+font = pygame.font.Font(None, 16)
 
-gk_dir = 1
-score = 0
-font = pygame.font.Font(None, 16) 
+def reset_game():
+    global p_x, p_y, gk_x, gk_y, gp_x, gp_y, fb_x, fb_y, gk_dir, score, ball_kicked, fb_dx, fb_dy, fb_dir
+    p_x, p_y = 10, 80
+    gk_x, gk_y = 50, 30
+    gp_x, gp_y = 32, 10  
+    fb_x, fb_y = 40, 90
+    gk_dir = 1
+    score = 0
+    ball_kicked = False
+    fb_dx, fb_dy = 0, 0
+    fb_dir = 2
 
-def reset_ball():
-    global fb_x, fb_y, score
-    if fb_y <= gp_y and not (gp_x < fb_x < gp_x + 32):
-        score -= 1 
-    fb_x = random.randint(10, W - 20)
-    fb_y = 90
+reset_game()
+
+def reset_ball(is_goal):
+    global fb_x, fb_y, score, ball_kicked, fb_dx, fb_dy, fb_dir
+    if is_goal:
+        score += 1  
+    else:
+        score -= 1  
+
+    fb_x, fb_y = 40, 90  
+    ball_kicked = False  
+    fb_dx, fb_dy = 0, 0  
+    fb_dir = 2  
 
 def animate_kick():
     for img in p_imgs[1:]:
@@ -50,8 +64,7 @@ def animate_kick():
         time.sleep(0.1)
 
 run = True
-fb_dx, fb_dy = random.choice([-2, 2]), 0
-ball_kicked, frame, bg_frame, fb_frame = False, 0, 0, 0
+frame, bg_frame, fb_frame = 0, 0, 0
 
 while run:
     screen.blit(bgs[bg_idx], (0, 0))
@@ -71,34 +84,37 @@ while run:
     if keys[pygame.K_RIGHT] and p_x < W - 20:
         p_x += 2
 
-    if keys[pygame.K_b]:
+    if keys[pygame.K_b] and not ball_kicked:  
         animate_kick()
-        ball_kicked, fb_dy = True, -3
+        ball_kicked = True
+        fb_dx = random.choice([-2, 2])  
+        fb_dy = -3  
+
+    if keys[pygame.K_a]:  
+        reset_game()
 
     if keys[pygame.K_c]:  
-        run = False
+        run = False  
 
     if ball_kicked:
-        fb_y += fb_dy
+        fb_x += fb_dx  
+        fb_y += fb_dy  
+    else:
+        fb_x += fb_dir
+        if fb_x <= 0 or fb_x >= W - 16:
+            fb_dir *= -1  
 
-    fb_x += fb_dx
     if fb_x <= 0 or fb_x >= W - 16:
-        fb_dx *= -1
+        fb_dx *= -1  
 
-    if fb_y <= gp_y and gp_x < fb_x < gp_x + 32:
-        score += 1
-        reset_ball()
+    if fb_y <= gp_y:  
+        if gp_x < fb_x < gp_x + 32:  
+            reset_ball(True)  
+        else:
+            reset_ball(False)  
 
-    if fb_y <= gk_y + 16 and gk_x < fb_x < gk_x + 16:
-        score -= 1
-        reset_ball()
-
-    if fb_y < 0: 
-        score -= 1
-        reset_ball()
-
-    if score <= -3:  
-        run = False
+    if fb_y < 0:  
+        reset_ball(False)  
 
     gk_x += gk_dir
     if gk_x <= 0 or gk_x >= W - 16:
@@ -136,4 +152,3 @@ pygame.display.update()
 time.sleep(4)
 
 pygame.quit()
-
