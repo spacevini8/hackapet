@@ -12,15 +12,16 @@ class MenuItem:
 class Game:
     def __init__(self):
         self.screen = renderer.Renderer('miyazaki-16.txt')
-        self.tama_sprite = self.screen.load_stacked_sprite('tamashort')
-        self.tama_sprite_jump = self.screen.load_stacked_sprite('tamajump')
-        self.tama_sleep_sprite = self.screen.load_stacked_sprite('tamasleep')
-        self.tama_dead_sprite = self.screen.load_stacked_sprite('grave')
+        self.tama_sprite = self.screen.load_stacked_sprite('tamashort.png', 19)
+        self.tama_sprite_jump = self.screen.load_stacked_sprite('tamajump.png', 18)
+        self.tama_sleep_sprite = self.screen.load_stacked_sprite('tamasleep.png', 14)
+        self.tama_dead_sprite = self.screen.load_stacked_sprite('grave.png', 20)
         self.current_sprite = self.tama_sprite
         self.tama_rot = 0
         self.tama_pos_x = 64
         self.tama_pos_y = 64
-        self.tama_speed = 5
+        self.tama_speed = 4
+        self.tama_rot_speed = math.pi/20
 
         self.bg_bmp = self.screen.load_sprite('background.bmp')
         self.world_size = self.screen.set_background(self.bg_bmp)
@@ -244,13 +245,13 @@ class Game:
                 
             if self.screen.key_left_down:
                 if not self.in_main_menu:
-                    self.rotate_tama(-math.pi/8)
+                    self.rotate_tama(-self.tama_rot_speed)
                     self.need_redraw = True
                 else:
                     if not self.screen.key_left_debounce: self.move_menu_item(1)
             elif self.screen.key_right_down:
                 if not self.in_main_menu:
-                    self.rotate_tama(math.pi/8)
+                    self.rotate_tama(self.tama_rot_speed)
                     self.need_redraw = True
                 else:
                     if not self.screen.key_right_debounce: self.move_menu_item(-1)

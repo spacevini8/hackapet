@@ -38,6 +38,8 @@ class Renderer:
         self.key_right_debounce = False
         self.key_up_debounce = False
 
+        print(self.clamp(10, 4, 8))
+
     def set_key_callback(self, key, function):
         self.key_callbacks[key] = function
 
@@ -88,12 +90,11 @@ class Renderer:
         #first colour in palette always transparent colour
         self.palette.make_transparent(0)
 
-    def load_stacked_sprite(self, folder):
-        stacked_sprites = []
-        num_files = len(os.listdir(folder))
-        for file in [f'{i}.bmp' for i in range(num_files)]:
-            stacked_sprites.append(displayio.OnDiskBitmap(folder+'/'+file))
-        return stacked_sprites
+    def load_stacked_sprite(self, path, num_slices):
+        bmp = displayio.OnDiskBitmap(path)
+        return {'bmp': displayio.OnDiskBitmap(path),
+                'num_slices': num_slices,
+                'slice_width': bmp.width//num_slices}
 
     def clear_screen(self, col):
         self.written_pixels = set()
@@ -159,28 +160,60 @@ class Renderer:
     #                     rotated_coords = self.rotate_coords(scaled_coords, rotation)
     #                     self.draw_pixel(rotated_coords[0]+ox, rotated_coords[1]+oy, bmp[x, y])
 
-    def draw_img_ex(self, bmp, ox, oy, scale=(1,1), rotation=0, overlay=True):
-        max_img_size = math.ceil(math.sqrt(bmp.width**2 + bmp.height**2))
-        hw, hh = max_img_size//2, max_img_size//2
-        bhw, bhh = bmp.width//2, bmp.height//2
-        out_img = [[0 for i in range(max_img_size)] for j in range(max_img_size)]
-        scale_x, scale_y = scale
-        for x in range(0, max_img_size):
-            for y in range(0, max_img_size):
-                rx, ry = self.rotate_coords((x-hw, y-hh), -rotation)
-                col = bmp[rx+bhw, ry+bhh]
-                for sx in range(scale_x):
-                    for sy in range(scale_y):
-                        dx = ox+sx-hw+x*scale_x
-                        dy = oy+sy-hh+y*scale_y
-                        if not overlay and self.get_pixel_written(dx, dy):
-                            continue
-                        self.draw_pixel(dx, dy, col)
+    def clamp(self, v, mn, mx):
+        return min(max(v, mn), mx)
 
-    def draw_stacked_sprite(self, sprites, ox, oy, scale=1, rotation=0):
-        top_y = oy-len(sprites)*scale
-        for i, bmp in enumerate(reversed(sprites)):
-            self.draw_img_ex(bmp, ox, top_y+i*scale, scale=(scale, scale), rotation=rotation, overlay=False)
+##    def draw_img_ex(self, bmp, ox, oy, px, py, width, height, scale=(1,1), rotation=0, overlay=True):
+##        if width is None: width = bmp.width
+##        if height is None: height = bmp.height
+##        max_img_size = math.ceil(math.sqrt(width**2 + height**2))
+##        hw, hh = max_img_size//2, max_img_size//2
+##        bhw, bhh = width//2, height//2
+##        #out_img = [[0 for i in range(max_img_size)] for j in range(max_img_size)]
+##        scale_x, scale_y = scale
+##        for x in range(0, max_img_size):
+##            for y in range(0, max_img_size):
+##                rx, ry = self.rotate_coords((x-hw, y-hh), -rotation)
+##                qx, qy = rx+bhw+px, ry+bhh+py
+##                #print(px, py, width, height, qx, qy)
+##                col = bmp[self.clamp(qx, px, px+width), qy]
+##                if qy < 0: continue
+##                for sx in range(scale_x):
+##                    for sy in range(scale_y):
+##                        dx = ox+sx-hw+x*scale_x
+##                        dy = oy+sy-hh+y*scale_y
+##                        if not overlay and self.get_pixel_written(dx, dy):
+##                            continue
+##                        self.draw_pixel(dx, dy, col)
+
+    def apply_shears(self, x, y, alpha, beta):
+        x = x + alpha*y
+        y = y + beta*x
+        x = x + alpha*y
+        return x, y
+
+    def draw_img_ex(self, bmp, screen_x_offset, screen_y_offset, frame_x, frame_y, frame_width, frame_height, scale=(1,1), rotation=0, overlay=True):
+        alpha = -math.tan(rotation/2)
+        beta = math.sin(rotation)
+        top_left_shear = self.apply_shears(0, 0, alpha, beta)
+        bottom_right_shear = self.apply_shears(frame_width, frame_height, alpha, beta)
+        sheared_width = bottom_right_shear[0]-top_left_shear[0]
+        shear_x_offset = (sheared_width/2)-top_left_shear[0]
+        sheared_height = bottom_right_shear[1]-top_left_shear[1]
+        shear_y_offset = (sheared_height/2)-top_left_shear[1]
+        for src_x in range(frame_width):
+            for src_y in range(frame_height):
+                src_col = bmp[src_x+frame_x, src_y+frame_y]
+                shear_x, shear_y = self.apply_shears(src_x, src_y, alpha, beta)
+                screen_x = int(shear_x+screen_x_offset-shear_x_offset)
+                screen_y = int(shear_y+screen_y_offset-shear_y_offset)
+                self.draw_pixel(screen_x, screen_y, src_col, overwrite=False)
+
+    def draw_stacked_sprite(self, sprite, ox, oy, scale=1, rotation=0):
+        bmp = sprite['bmp']
+        top_y = oy-sprite['num_slices']*scale
+        for n_slice in reversed(range(0, sprite['num_slices']+1)):
+            self.draw_img_ex(bmp, ox, top_y+n_slice*scale, bmp.width-(n_slice*sprite['slice_width']), 0, sprite['slice_width'], bmp.height, scale=(scale, scale), rotation=rotation, overlay=False)
 
     # def draw_stacked_sprite(self, name, ox, oy, scale=1, rotation=0, offset=1):
     #     self.sprite_tiles = []
