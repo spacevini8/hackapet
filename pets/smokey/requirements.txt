@@ -11,6 +11,7 @@ Adafruit-PlatformDetect==3.77.0
 Adafruit-PureIO==1.1.11
 binho-host-adapter==0.1.6
 blinka-displayio-pygamedisplay @ git+https://github.com/CyrilSLi/Blinka_Displayio_PyGameDisplay.git@a7262ebd1e4f103f9aa7bc4c8c26aacd4e21259f
+ntplib==0.4.0
 numpy==2.2.2
 pillow==11.1.0
 pyftdi==0.56.0
