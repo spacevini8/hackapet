@@ -208,12 +208,13 @@ while True:
                 bombs.clear()
                 strawberries.clear()
                 goldberries.clear()
-                if 'dead' in globals():
+                if dead in splash:
                     splash.remove(dead)
-                if 'end' in globals():
+                if end in splash:
                     splash.remove(end)
                 game_over = False
                 state = 0
+                count = 0
 
     keys = pygame.key.get_pressed()
 
@@ -231,7 +232,6 @@ while True:
     
     if current_time - last_collection_time > timeout_duration:
         state = 0
-        bonnie_sprite[0] = direction + state
 
     # Move bombs and check for collisions
     for bomb in bombs:
@@ -253,6 +253,7 @@ while True:
             splash.remove(strawberry)
             strawberries.remove(strawberry)
         elif check_collision(bonnie_sprite, strawberry):
+            timeout_duration = 2000
             last_collection_time = pygame.time.get_ticks()
             state = 2
             count += 1
@@ -266,6 +267,7 @@ while True:
             splash.remove(goldberry)
             goldberries.remove(goldberry)
         elif check_collision(bonnie_sprite, goldberry):
+            timeout_duration = 2000
             last_collection_time = pygame.time.get_ticks()
             state = 2
             count += 3
@@ -276,6 +278,9 @@ while True:
     if count >= 100:
         count = 100
         progress = 10
+        timeout_duration = 999999
+        last_collection_time = pygame.time.get_ticks()
+        state = 2
         game_over = True
         display_end()
     elif count >= 90:
