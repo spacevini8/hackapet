@@ -111,12 +111,12 @@ def save_score(score_param):
 
 def countdown():
     count = 3
-    countdown_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
+    countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
     splash.append(countdown_label)
 
     for i in range(0, 3):
         splash.remove(countdown_label)
-        countdown_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
+        countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
         splash.append(countdown_label)
         count -= 1
         time.sleep(0.5)
@@ -148,11 +148,11 @@ splash.append(game_over_sprite)
 
 lives = 3
 score = 0
-score_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1, x=2, y=4)
+score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1, x=2, y=4)
 splash.append(score_label)
 
 highscore = read_high_score()
-highscore_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=f"highscore: {str(highscore)}", color=000000, scale=1, x=2, y=15)
+highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"highscore: {str(highscore)}", color=000000, scale=1, x=2, y=15)
 splash.append(highscore_label)
 
 change_bg()
@@ -202,7 +202,7 @@ while True:
             score += 1
 
             splash.remove(score_label)
-            score_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1,
+            score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1,
                                       x=2, y=4)
             splash.append(score_label)
 
@@ -238,7 +238,7 @@ while True:
             save_score(score)
 
             splash.remove(highscore_label)
-            highscore_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=f"highscore: {str(highscore)}",
+            highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"highscore: {str(highscore)}",
                                           color=000000, scale=1, x=2, y=15)
             splash.append(highscore_label)
 
@@ -251,7 +251,7 @@ while True:
             lives = 3
             score = 0
             splash.remove(score_label)
-            score_label = label.Label(font=bitmap_font.load_font("../ter-u12.bdf"), text=f"score: {str(score)}",
+            score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}",
                                       color=000000, scale=1,
                                       x=2, y=4)
             splash.append(score_label)
