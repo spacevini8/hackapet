@@ -14,3 +14,5 @@ Press UP once you have decided on a response option (thumbs up or down) to confi
 Press up to continue the Roomba dialogue
 Repeat and let the Roomba decide your fate!
 Press UP to restart and try finding another roomba!
+
+(Also don't hold the UP button, it will make the game turbo mode cause I couldn't figure out how to make it only progress once :'D)
