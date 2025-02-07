@@ -31,8 +31,8 @@ ball = displayio.TileGrid(
     pixel_shader=ball_bitmap.pixel_shader,
     width=1,
     height=1,
-    tile_width=ball_bitmap.width,
-    tile_height=ball_bitmap.height,
+    tile_width=11,
+    tile_height=11,
     x=paddle.x+10,
     y=98
 )
@@ -87,7 +87,7 @@ adjust = displayio.TileGrid(
 credits_bitmap = displayio.OnDiskBitmap("assets/credits.bmp")
 credits = displayio.TileGrid(credits_bitmap, pixel_shader=credits_bitmap.pixel_shader)
 
-
+# 0 = game screen, 1 = settings screen, 2 = credits
 screen = 0
 
 # Screen definitions
@@ -115,6 +115,7 @@ ball_y_speed = 0
 ball_x_dir = 1
 ball_y_dir = 1
 move_speed = 7
+frame = 0
 game_over = True
 
 # Settings vars
@@ -154,8 +155,6 @@ while True:
         
         ball.x += (ball_x_speed * ball_x_dir)
         ball.y -= (ball_y_speed * ball_y_dir)
-
-        # Fake physics, swaps the ball direction when it hits a certain bound and also might add some random extra speed in 1 direction
         if ball.x >= 100:
             ball.x = 100
             ball_x_dir *= -1
@@ -171,6 +170,7 @@ while True:
 
         if ball.y >= 100:
             if ball.x >= paddle.x - 10 and ball.x <= paddle.x + 30:
+                ball.y = 99
                 ball_y_dir = 1
                 ball_y_speed = speed_seting + round(random.random()*3)
             else:
@@ -209,5 +209,9 @@ while True:
         if keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]:
             screen = 1
             draw_elements()
+
+    ball[0] = frame
+    if game_over == False:
+        frame = (frame + 1) % (ball_bitmap.width // 11)
 
     time.sleep(0.07)
