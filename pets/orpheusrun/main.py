@@ -23,7 +23,7 @@ JUMP_FORCE = -12
 OBSTACLE_SPEED = 3
 SPRITE_WIDTH = 32
 SPRITE_HEIGHT = 32
-ANIMATION_FRAMES = 4
+ANIMATION_FRAMES = 9
 FPS = 12
 
 PINEAPPLE_MIN_SCALE = 1.2
@@ -202,10 +202,10 @@ class Game:
         main_group.append(self.ground_grid)
         main_group.append(self.dino.tile_grid)
         
-        # Remove score-related code and add game over display
+        
         self.game_over_group = displayio.Group()
         
-        # Create black background for game over screen
+        
         self.black_bg = displayio.Bitmap(128, 128, 1)
         self.black_palette = displayio.Palette(1)
         self.black_palette[0] = BLACK
@@ -215,11 +215,11 @@ class Game:
         )
         self.game_over_group.append(self.black_bg_grid)
         
-        # Load pumpkin sprite for rating
+        
         self.pumpkin_sprite = OnDiskBitmap("sprites/pumpkin.png")
         self.pumpkin_palette = self.pumpkin_sprite.pixel_shader
         
-        # Create three pumpkin sprites
+        
         self.pumpkins = []
         for i in range(3):
             pumpkin = TileGrid(
@@ -230,8 +230,8 @@ class Game:
                 tile_width=16,
                 tile_height=16
             )
-            pumpkin.x = 40 + (i * 24)  # Space pumpkins horizontally
-            pumpkin.y = 56  # Center vertically
+            pumpkin.x = 40 + (i * 24)  
+            pumpkin.y = 56  
             self.pumpkins.append(pumpkin)
     
     def start_game(self):
@@ -242,11 +242,11 @@ class Game:
     def show_game_over(self):
         self.survival_time = time.monotonic() - self.start_time
         
-        # Clear game over group and add black background
+        
         while len(self.game_over_group) > 1:
             self.game_over_group.pop()
             
-        # Add appropriate number of pumpkins based on survival time
+        
         if self.survival_time >= 30:
             for pumpkin in self.pumpkins:
                 self.game_over_group.append(pumpkin)
@@ -299,7 +299,7 @@ class Game:
 def main():
     game = Game()
     last_update = time.monotonic()
-    update_interval = 1/60  # 60 FPS
+    update_interval = 1/60  
     
     while True:
         current_time = time.monotonic()
@@ -320,7 +320,7 @@ def main():
                     else:
                         game.dino.jump()
         
-        # Update game at fixed time intervals
+        
         if current_time - last_update >= update_interval:
             if not game.show_title:
                 game.update()
