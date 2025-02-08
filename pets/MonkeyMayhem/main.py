@@ -5,6 +5,7 @@ from adafruit_display_text import label
 import random
 import os
 import time
+import math
 
 
 pygame.init()
@@ -26,22 +27,31 @@ BACKGROUND_IMAGES = [
 MONKEY_IMAGES = {
     "right": os.path.join(ASSET_PATH, "monkey_right.bmp"),
     "left": os.path.join(ASSET_PATH, "monkey_left.bmp"),
+    "standing": os.path.join(ASSET_PATH, "monkey_standing.bmp"),
 }
 BANANA_IMAGES = {
     "normal": os.path.join(ASSET_PATH, "banana_normal.bmp"),
     "rotten": os.path.join(ASSET_PATH, "banana_rotten.bmp"),
     "super": os.path.join(ASSET_PATH, "banana_super.bmp"),
 }
+UI_IMAGES = {
+    "heart": os.path.join(ASSET_PATH, "heart.bmp"),
+    "start_screen": os.path.join(ASSET_PATH, "start_screen.bmp"),
+    "death_screen": os.path.join(ASSET_PATH, "death_screen.bmp"),
+}
 
 
 backgrounds = [pygame.image.load(img) for img in BACKGROUND_IMAGES]
 monkey_right = pygame.image.load(MONKEY_IMAGES["right"])
 monkey_left = pygame.image.load(MONKEY_IMAGES["left"])
+monkey_standing = pygame.image.load(MONKEY_IMAGES["standing"])
 banana_images = {key: pygame.image.load(img) for key, img in BANANA_IMAGES.items()}
+ui_images = {key: pygame.image.load(img) for key, img in UI_IMAGES.items()}
 
 
 monkey_right = pygame.transform.scale(monkey_right, (32, 32))
 monkey_left = pygame.transform.scale(monkey_left, (32, 32))
+monkey_standing = pygame.transform.scale(monkey_standing, (32, 32))
 for key in banana_images:
     banana_images[key] = pygame.transform.scale(banana_images[key], (32, 32))
 
@@ -58,6 +68,7 @@ score = 0
 banana_list = []
 banana_speed = 2
 banana_spawn_rate = 30
+last_speed_increase = 0  
 
 background_index = 0
 
@@ -65,6 +76,12 @@ game_running = False
 game_over_displayed = False
 
 last_background_switch = time.time()
+
+
+dance_amplitude = 20  
+dance_frequency = 4  
+dance_x = SCREEN_WIDTH // 2 - 16
+dance_base_y = SCREEN_HEIGHT // 2
 
 def spawn_banana():
     banana_type = random.choices(
@@ -80,7 +97,7 @@ def move_bananas():
         banana["y"] += banana_speed
 
 def check_collisions():
-    global hearts, score, banana_speed
+    global hearts, score, banana_speed, last_speed_increase
     for banana in banana_list[:]:
         if (
             banana["x"] < monkey_x + 32
@@ -96,8 +113,11 @@ def check_collisions():
                 hearts = min(3, hearts + 1)
                 score += 3
             banana_list.remove(banana)
-    if score % 10 == 0 and score > 0:
-        banana_speed = int(banana_speed * 1.10)
+            
+            
+            if score // 10 > last_speed_increase:
+                banana_speed = banana_speed * 1.1  
+                last_speed_increase = score // 10
 
 def draw_game():
     global background_index, last_background_switch
@@ -115,20 +135,25 @@ def draw_game():
         screen.blit(monkey_left, (monkey_x, monkey_y))
     for banana in banana_list:
         screen.blit(banana_images[banana["type"]], (banana["x"], banana["y"]))
+    
+    
+    heart_img = ui_images["heart"]
     for i in range(hearts):
-        pygame.draw.ellipse(screen, (255, 0, 0), (5 + i * 15, 5, 10, 10))
+        screen.blit(heart_img, (5 + i * 15, 5))
+    
     font = pygame.font.SysFont(None, 24)
     score_text = font.render(f"Score: {score}", True, (255, 0, 0))
-    screen.blit(score_text, (SCREEN_WIDTH - 90, 5))
+    screen.blit(score_text, (SCREEN_WIDTH - 70, 5))
 
 def reset_game():
-    global monkey_x, monkey_y, hearts, score, banana_list, banana_speed, game_running, game_over_displayed
+    global monkey_x, monkey_y, hearts, score, banana_list, banana_speed, game_running, game_over_displayed, last_speed_increase
     monkey_x = SCREEN_WIDTH // 2 - 16
     monkey_y = SCREEN_HEIGHT - 32
     hearts = 3
     score = 0
     banana_list = []
     banana_speed = 2
+    last_speed_increase = 0
     game_running = False
     game_over_displayed = False
 
@@ -144,27 +169,29 @@ while running:
     keys = pygame.key.get_pressed()
     if not game_running:
         if hearts <= 0:
-            
+            screen.blit(ui_images["death_screen"], (0, 0))
             font = pygame.font.SysFont(None, 16)
-            game_over_text = font.render("You Lost!", True, (255, 0, 0))
-            restart_text = font.render("Press SPACE to restart", True, (255, 255, 255))
-            
-            
-            game_over_x = SCREEN_WIDTH // 2 - game_over_text.get_width() // 2
-            game_over_y = SCREEN_HEIGHT // 2 - 10
-            restart_x = SCREEN_WIDTH // 2 - restart_text.get_width() // 2
-            restart_y = SCREEN_HEIGHT // 2 + 5
-            
-            screen.blit(game_over_text, (game_over_x, game_over_y))
-            screen.blit(restart_text, (restart_x, restart_y))
+            score_text = font.render(f"Final Score: {score}", True, (255, 0, 0))
+            score_x = SCREEN_WIDTH // 2 - score_text.get_width() // 2
+            screen.blit(score_text, (score_x, SCREEN_HEIGHT // 2 + 20))
             
             if keys[pygame.K_SPACE]:
                 reset_game()
                 game_running = True
         else:
-            font = pygame.font.SysFont(None, 18)
-            start_text = font.render("Press Space to Start", True, (255, 255, 255))
-            screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, SCREEN_HEIGHT // 2 - start_text.get_height() // 2))
+            screen.blit(ui_images["start_screen"], (0, 0))
+            
+            
+            current_time = time.time()
+            dance_y = dance_base_y + math.sin(current_time * dance_frequency) * dance_amplitude
+            
+            
+            dance_x_offset = math.sin(current_time * dance_frequency * 0.5) * dance_amplitude
+            current_dance_x = dance_x + dance_x_offset
+            
+            
+            screen.blit(monkey_standing, (current_dance_x, dance_y))
+            
             if keys[pygame.K_SPACE]:
                 game_running = True
     else:
