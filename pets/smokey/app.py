@@ -17,14 +17,14 @@ display.show(splash)
 
 bg_state = "sun_mnt"
 
-try:
-    c = ntplib.NTPClient()
-    response = c.request("pool.ntp.org")
-    currentHour = time.localtime(response.tx_time).tm_hour
-    if currentHour > 19 or currentHour < 6:
-        bg_state = "night_mnt"
-except:
-    print("No internet")
+# try:
+#     c = ntplib.NTPClient()
+#     response = c.request("pool.ntp.org")
+#     currentHour = time.localtime(response.tx_time).tm_hour
+#     if currentHour > 19 or currentHour < 6:
+#         bg_state = "night_mnt"
+# except:
+#     print("No internet")
 
 if bg_state == "sun_mnt":
     sun_bg_sheet = displayio.OnDiskBitmap("sun_bg.bmp")
@@ -67,15 +67,40 @@ bear_sprite = displayio.TileGrid(
     tile_height=32,
     default_tile=0,
     x=int((display.width / 2)) - 16,
-    y=display.height - 32,
+    y=display.height - 29,
 )
 
 splash.append(bear_sprite)
 
+timer_sheet = displayio.OnDiskBitmap("timer.bmp")
+
+timer_sprite = displayio.TileGrid(
+    timer_sheet,
+    pixel_shader=timer_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+)
+
+splash.append(timer_sprite)
+
+score_label_text = label.Label(
+    bitmap_font.load_font("font.bdf"),
+    text="Score:",
+    color=0xFFFFFF,
+    y=int(display.height / 2) - 20,
+    x=20,
+)
+
+splash.append(score_label_text)
+score_label_text.text = ""
+
 score_text = label.Label(
     bitmap_font.load_font("font.bdf"),
     text="Start",
-    color=0x0000FF,
+    color=0xFFFFFF,
     y=int(display.height / 2),
     x=20,
 )
@@ -128,6 +153,11 @@ windowState = "title"
 gameTimer = 0
 score = 0
 
+initial = True
+
+timer_timer = 0
+timer_frame = 0
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -137,16 +167,19 @@ while True:
             if event.key == pygame.K_UP and windowState == "title":
                 windowState = "game"
                 score_text.text = ""
+                score_label_text.text = ""
+                score = 0
 
-    if gameTimer >= 25:
+    if gameTimer >= 5:
         windowState = "title"
         gameTimer = 0
         for objectType in fallingObjects:
-            for individual in fallingObjects[objectType]:
-                splash.remove(individual)
+            for individual in fallingObjects[objectType][:]:
                 fallingObjects[objectType].remove(individual)
+                splash.remove(individual)
         bear_sprite.x = int((display.width / 2)) - 16
         bear_sprite.y = display.height - 32
+        score_label_text.text = "Score:"
         score_text.text = str(score)
 
     keys = pygame.key.get_pressed()
@@ -206,5 +239,9 @@ while True:
         bear_sprite[0] = 0
 
     if windowState == "game":
+        if (timer_timer / 10).is_integer() and timer_timer % 5 == 0:
+            timer_sprite[0] = timer_frame
+            timer_frame = (timer_frame + 1) % (timer_sheet.width // 128)
+        timer_timer += 1
         gameTimer += 0.1
     time.sleep(0.1)
