@@ -1,5 +1,3 @@
-from turtledemo.penrose import start
-
 import displayio
 from adafruit_bitmap_font import bitmap_font
 from blinka_displayio_pygamedisplay import PyGameDisplay
