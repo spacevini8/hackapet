@@ -1,3 +1,5 @@
+from turtledemo.penrose import start
+
 import displayio
 from adafruit_bitmap_font import bitmap_font
 from blinka_displayio_pygamedisplay import PyGameDisplay
@@ -75,7 +77,8 @@ duck_sprite.speed_x = 1
 
 frame = 0
 
-game_state = 1
+game_state = 0
+colours = [000000, 229944]
 #0: menu
 #1: game
 #2: game over
@@ -111,13 +114,17 @@ def save_score(score_param):
 
 def countdown():
     count = 3
-    countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
+    countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=colours[bg_sprite[0]],
+                                      scale=5, x=53, y=64)
     splash.append(countdown_label)
 
     for i in range(0, 3):
         splash.remove(countdown_label)
-        countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=000000, scale=5, x=53, y=64)
+
+        countdown_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=str(count), color=colours[bg_sprite[0]],
+                                          scale=5, x=53, y=64)
         splash.append(countdown_label)
+
         count -= 1
         time.sleep(0.5)
     splash.remove(countdown_label)
@@ -129,6 +136,21 @@ def change_bread_expression():
         bread_sprite[0] = 0
 
 
+start_menu_sheet = displayio.OnDiskBitmap("start_menu_spritesheet.bmp")
+
+start_menu_sprite = displayio.TileGrid(
+    start_menu_sheet,
+    pixel_shader=start_menu_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+    x=0,
+    y=0
+)
+
+splash.append(start_menu_sprite)
 
 game_over_sheet = displayio.OnDiskBitmap("game_over_spritesheet.bmp")
 
@@ -148,15 +170,14 @@ splash.append(game_over_sprite)
 
 lives = 3
 score = 0
-score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1, x=2, y=4)
+change_bg()
+score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=colours[bg_sprite[0]], scale=1, x=20, y=4)
 splash.append(score_label)
 
 highscore = read_high_score()
-highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"highscore: {str(highscore)}", color=000000, scale=1, x=2, y=15)
+highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"highscore: {str(highscore)}", color=colours[bg_sprite[0]], scale=1, x=20, y=15)
 splash.append(highscore_label)
 
-change_bg()
-countdown()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -164,17 +185,21 @@ while True:
             exit()
 
     if game_state == 0:
-        pass
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            start_menu_sprite[0] = 1
+            game_state = 1
+            countdown()
 
     if game_state == 1:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            duck_sprite.x -= 2
+            duck_sprite.x -= 1
             duck_sprite.direction = 0
             duck_sprite[0] = duck_sprite.direction
 
         if keys[pygame.K_RIGHT]:
-            duck_sprite.x += 2
+            duck_sprite.x += 1
             duck_sprite.direction = 1
             duck_sprite[0] = duck_sprite.direction
 
@@ -202,8 +227,8 @@ while True:
             score += 1
 
             splash.remove(score_label)
-            score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=000000, scale=1,
-                                      x=2, y=4)
+            score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}", color=colours[bg_sprite[0]], scale=1,
+                                      x=20, y=4)
             splash.append(score_label)
 
             change_bread_expression()
@@ -213,6 +238,7 @@ while True:
 
         if bread_sprite.y >= 128 or bread_sprite.x <= -10 or bread_sprite.x >= 138:
             lives -= 1
+
             if lives <= 0:
                 game_state = 2
 
@@ -237,27 +263,32 @@ while True:
             highscore = score
             save_score(score)
 
-            splash.remove(highscore_label)
-            highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"highscore: {str(highscore)}",
-                                          color=000000, scale=1, x=2, y=15)
-            splash.append(highscore_label)
-
 
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_SPACE]:
+
             change_bg()
-            game_state = 1
+
             lives = 3
             score = 0
+
             splash.remove(score_label)
             score_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"), text=f"score: {str(score)}",
-                                      color=000000, scale=1,
-                                      x=2, y=4)
+                                      color=colours[bg_sprite[0]], scale=1,
+                                      x=20, y=4)
             splash.append(score_label)
+
+            splash.remove(highscore_label)
+            highscore_label = label.Label(font=bitmap_font.load_font("ter-u12.bdf"),
+                                          text=f"highscore: {str(highscore)}",
+                                          color=colours[bg_sprite[0]], scale=1, x=20, y=15)
+            splash.append(highscore_label)
+
             bread_sprite.x = display.width // 2
             bread_sprite.y = 2
             game_over_sprite[0] = 1
+            game_state = 1
             countdown()
 
 
