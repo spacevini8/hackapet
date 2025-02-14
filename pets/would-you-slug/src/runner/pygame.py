@@ -11,7 +11,7 @@ class PygameRunner(Runner):
   _should_exit = False
 
   def _init_display(self):
-    return PyGameDisplay(width=128, height=128, scale=3)
+    return PyGameDisplay(width=128, height=128)
   
   def _update_inputs(self, key, pressed):
     if key == pygame.K_a:
