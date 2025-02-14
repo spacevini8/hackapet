@@ -116,6 +116,7 @@ ball_x_dir = 1
 ball_y_dir = 1
 move_speed = 7
 frame = 0
+frame_offset = 2
 game_over = True
 
 # Settings vars
@@ -128,7 +129,7 @@ while True:
     if display.check_quit():
         break
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             pygame.quit()
             exit()
 
@@ -159,26 +160,30 @@ while True:
             ball.x = 100
             ball_x_dir *= -1
             ball_x_speed = speed_seting + round(random.random()*3)
+            frame_offset = (frame_offset + 1) % 3
         if ball.x <= 16:
             ball.x = 16
             ball_x_dir *= -1
             ball_x_speed = speed_seting + round(random.random()*3)
+            frame_offset = (frame_offset + 1) % 3
         if ball.y <= 17:
             ball.y = 17
             ball_y_dir *= -1
             ball_y_speed = speed_seting + round(random.random()*3)
+            frame_offset = (frame_offset + 1) % 3
 
         if ball.y >= 100:
             if ball.x >= paddle.x - 10 and ball.x <= paddle.x + 30:
                 ball.y = 99
                 ball_y_dir = 1
                 ball_y_speed = speed_seting + round(random.random()*3)
+                frame_offset = (frame_offset + 1) % 3
             else:
                 splash.append(prompt)
                 game_over = True
     elif screen == 1: # Settings screen
         if not adjusting:
-            if keys[pygame.K_RIGHT] and cursor_pos < 2:
+            if keys[pygame.K_RIGHT] and cursor_pos < len(button_positions) - 1:
                 cursor_pos += 1
             if keys[pygame.K_LEFT] and cursor_pos > 0:
                 cursor_pos -= 1
@@ -210,8 +215,8 @@ while True:
             screen = 1
             draw_elements()
 
-    ball[0] = frame
+    ball[0] = frame + frame_offset*4
     if game_over == False:
-        frame = (frame + 1) % (ball_bitmap.width // 11)
+        frame = (frame + 1) % 4
 
     time.sleep(0.07)
