@@ -11,6 +11,11 @@ display = PyGameDisplay(width=128, height=128)
 splash = displayio.Group()
 display.show(splash)
 
+# Variables
+frame = 0
+speed = 7
+game_over = False
+
 # Background sprite
 bg_sheet = displayio.OnDiskBitmap("sprites/home.bmp")
 bg_sprite = displayio.TileGrid(
@@ -46,6 +51,29 @@ electric_bitmap = displayio.OnDiskBitmap("sprites/biscuits/electric.bmp")
 fire_bitmap = displayio.OnDiskBitmap("sprites/biscuits/fire.bmp")
 water_bitmap = displayio.OnDiskBitmap("sprites/biscuits/water.bmp")
 fireball_bitmap = displayio.OnDiskBitmap("sprites/chocolate.bmp")
+
+# Start screen
+start_sheet = displayio.OnDiskBitmap("sprites/start.bmp")
+start_sprite = displayio.TileGrid(
+    start_sheet,
+    pixel_shader=bg_sheet.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=128,
+    tile_height=128,
+    default_tile=0,
+    x=(display.width - 128) // 2,
+    y=display.height - 128 - 0
+)
+
+screen = 1 # 1: Start screen, 2: Main game
+
+# Function to display the start screen
+def display_start_screen():
+    splash.append(start_sprite)
+
+# Restart sprite
+restart = displayio.OnDiskBitmap("sprites/restart.bmp")
 
 fireballs = []
 biscuits = []
@@ -142,9 +170,7 @@ def display_death():
         splash.remove(i)
     biscuits.clear()
 
-frame = 0
-speed = 5
-game_over = False
+display_start_screen()
 
 while True:
 
@@ -159,14 +185,19 @@ while True:
                 fireballs.clear()
                 splash.remove(death)
                 game_over = False
-
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP and screen == 1:
+                splash.remove(start_sprite)
+                splash.append(bg_sprite)
+                splash.append(eevee_sprite)
+                screen = 2
 
     keys = pygame.key.get_pressed()
 
-    if game_over == False:
-        if keys[pygame.K_LEFT]:
+    if screen == 2 and game_over == False:
+        if keys[pygame.K_LEFT] and eevee_sprite.x > 0:
             eevee_sprite.x -= speed
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and eevee_sprite.x < 98:
             eevee_sprite.x += speed
         if random.random() < 0.026:  # spawn rate
             spawn_fireball()
