@@ -18,3 +18,5 @@ Down Arrow - SQUISH THE BLOB!!!!
 There's also a hidden code... it's a variation of the Konami code due to the 3-key limitation... hidden somewhere in this README!!🤭🤭
 
 btw it turns your blob into a COOKIE and it get's EATEN—NOOOOOOO!!!!!!!!😭😭😭😭😭
+
+(the konami thing is broken)
