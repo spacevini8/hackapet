@@ -52,7 +52,7 @@ splash.append(bg_sprite1)
 
 
 
-anglerfish_sheet = displayio.OnDiskBitmap("anglerfishRight.bmp")
+anglerfish_sheet = displayio.OnDiskBitmap("anglerfishV2red.bmp")
 
 tile_width = 64
 tile_height = 64
@@ -71,7 +71,7 @@ anglerfish_sprite = displayio.TileGrid(
 
 winText_sprite = displayio.TileGrid(
     winText,
-    pixel_shader=anglerfish_sheet.pixel_shader,
+    pixel_shader=winText.pixel_shader,
     width=1,
     height=1,
     tile_width=tile_width,
@@ -82,7 +82,7 @@ winText_sprite = displayio.TileGrid(
 )
 lostText_sprite = displayio.TileGrid(
     lostText,
-    pixel_shader=anglerfish_sheet.pixel_shader,
+    pixel_shader=lostText.pixel_shader,
     width=1,
     height=1,
     tile_width=tile_width,
@@ -94,7 +94,7 @@ lostText_sprite = displayio.TileGrid(
 
 finalText_sprite = displayio.TileGrid(
     finalText,
-    pixel_shader=anglerfish_sheet.pixel_shader,
+    pixel_shader=finalText.pixel_shader,
     width=1,
     height=1,
     tile_width=tile_width,
@@ -103,7 +103,17 @@ finalText_sprite = displayio.TileGrid(
     x=(display.width - tile_width) // 2,  
     y=display.height - tile_height - 10     
 )
-
+restart_sprite = displayio.TileGrid(
+    restart,
+    pixel_shader=restart.pixel_shader,
+    width=1,
+    height=1,
+    tile_width=tile_width,
+    tile_height=tile_height,
+    default_tile=0,
+    x=(display.width - tile_width) // 2,  
+    y=display.height - tile_height - 10     
+)
 
 
 
@@ -144,11 +154,10 @@ def check_collision(sprite1, sprite2):
 death = displayio.OnDiskBitmap("restart.bmp")
 
 def display_game_over():
-    start_time = pygame.time.get_ticks()
     global death_hi
     death_hi = displayio.TileGrid(
         lostText,
-        pixel_shader=anglerfish_sheet.pixel_shader,
+        pixel_shader=lostText.pixel_shader,
         width=1,
         height=1,
         tile_width=64,
@@ -184,14 +193,17 @@ def winSequence():
     # show score on screen
     time.sleep(3)
     splash.remove(finalText_sprite)
+    time.sleep(1)
+    splash.append(restart_sprite)
+
+
 
 
 frame = 0
 speed = 4 
 game_over = True
 
-start_time = None
-timer_duration = 60000  # 60 seconds (in milliseconds)
+
 
 
 
@@ -209,7 +221,8 @@ while True:
                 # splash.remove(death_hi)
                 splash.append(bg_sprite2)
                 time.sleep(1)
-                splash.append(anglerfish_sprite)
+                if anglerfish_sprite not in splash:
+                    splash.append(anglerfish_sprite)
                 # splash.remove(playButton)
                 points=0
                 # score_label.text = f"Score: {points}"  # **2️⃣ Reset score on restart**
@@ -217,6 +230,14 @@ while True:
                 score_label = label.Label(font, text=f"Score: {points}", color=0000, x=5, y=5)
                 splash.append(score_label)
                 start_time = pygame.time.get_ticks()  # Start the timer
+                timer_duration = 90000  # 90 seconds (in milliseconds)
+                timer_label = label.Label(font, text="Time: 60", color=0x0000, x=5, y=20)
+                splash.append(timer_label)
+
+
+            
+
+
                
 
             
@@ -225,21 +246,26 @@ while True:
     keys = pygame.key.get_pressed()
         
     if game_over == False:
-        splash.append(anglerfish_sprite)
         elapsed_time = pygame.time.get_ticks() - start_time
         remaining_time = max(0, (timer_duration - elapsed_time) // 1000)
-        timer_label = label.Label(font, text=f"Time: {remaining_time}", color=0x0000, x=5, y=20)  # **5️⃣ Create a label for the timer**
-        splash.append(timer_label) # **4️⃣ Add the timer label back to the screen**
+
+        # Update the timer label instead of appending new ones
+        timer_label.text = f"Time: {remaining_time}"
+
         if points == 100:
-            score_label = label.Label(font, text=f"Score: {points}", color=0000, x=5, y=5)
-            splash.append(bg_sprite3)
-            splash.append(score_label)
-            start_time = pygame.time.get_ticks()
-        if points == 350:
+            # score_label = label.Label(font, text=f"Score: {points}", color=0000, x=5, y=5)
+            # splash.remove(bg_sprite1)
+            splash.insert(2, bg_sprite3)	
+            # splash.append(score_label)
+            # start_time = pygame.time.get_ticks()
+
+
+
+        if points == 300:
             winSequence()
             game_over = True
-            splash.append(bg_sprite1)
             points=0
+
         if keys[pygame.K_LEFT]: 
             anglerfish_sprite.x -= speed
         if keys[pygame.K_RIGHT]:
@@ -250,6 +276,7 @@ while True:
             display_game_over()
             game_over = True
             splash.append(bg_sprite1)
+
 
     # while game_over == False:
     #     clock=pygame.time.Clock()
@@ -269,6 +296,7 @@ while True:
     #         t=t+1
 
 
+
     for fish in fishs:
         fish.y += 5 
         if fish.y > display.height:
@@ -282,11 +310,12 @@ while True:
             fishs.remove(fish)
 
 
+
     anglerfish_sprite[0] = frame
     frame = (frame + 1) % (anglerfish_sheet.width // 64)
     bg_sprite1[0] = frame
     frame = (frame + 1) % (bathtub_background.width // 128)
 
+
     
     time.sleep(0.1)
-
