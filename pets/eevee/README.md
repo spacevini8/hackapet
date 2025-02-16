@@ -1,9 +1,7 @@
 
 ![readme picture](sprites/eevee.png)
 # Eevee Drop! 🔥⚡💧
-Eevee Drop is a simple collection game made for Hack Club's [Hackapet YSWS](https://hackapet.hackclub.dev/)! Play as the ever-adorable Eevee, and dodge poisonous chocolate while collecting Fire, Water, and Electric type biscuits! 
-
-Depending on what type you collect, you'll evolve into the corresponding Eeveelution! Just make sure to stay alive first...
+Eevee Drop is a simple collection game made for Hack Club's [Hackapet YSWS](https://hackapet.hackclub.dev/)! Play as an adorable Eevee, and dodge poisonous chocolate while collecting Fire, Water, and Electric type biscuits! 
 
 ## 💻 Setup
 1. Install Python
