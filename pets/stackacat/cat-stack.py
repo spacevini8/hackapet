@@ -165,8 +165,41 @@ while True:
     if fall_mode:
         cat_fall(fall)
         if fall.y > 128:
+            text_area.x = 28
             text_area.color = 0x0074D9
-            text_area.text = "Game Over"
+            text_area.text = "Game Over\n-> Restart"
+            
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_RIGHT]:
+                # restart
+                if fall in splash:
+                    splash.remove(fall)
+                
+                # remove all cats (sowy cant figure out)
+                for sprite in splash[:]:
+                    if isinstance(sprite, displayio.TileGrid) and sprite != bg_sprite and sprite != text_area:
+                        splash.remove(sprite)
+
+                fall.y = 96
+                moving_cat = spawn_cat(60)
+                moving_cat.y = 96
+                last_stacked_cat = cat_first_sprite
+                fall_mode = False
+
+                splash.append(cat_first_sprite)
+
+                text_area.x = 12
+                text_area.y = 56
+                text_area.color = 0x000000
+                text_area.text = "Press down key \nto start"
+
+                start = False
+                isLoopOne = True
+                bg_sprite.y = -324
+                cat_first_sprite.y = 112
+                moving_cat.y = 96
+                continue
+                
         time.sleep(0.05)
         continue
 
@@ -181,6 +214,7 @@ while True:
     if isWin:
         next_cat()
         time.sleep(1)
+        text_area.x = 32
         text_area.y = 30
         text_area.color = 0x0074D9
         text_area.text = "You Win!"
