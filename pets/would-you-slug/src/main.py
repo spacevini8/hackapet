@@ -40,7 +40,9 @@ def main(runner: Runner):
     player = Shelly()
     dangers = displayio.Group()
     squid = Squid()
-    score_text = Score()
+    score_text = Score(True)
+    peaceful_mode = True
+    game_begin_cooldown_frames = 0
 
     runner.splash.append(ground)
     runner.splash.append(squid)
@@ -48,19 +50,34 @@ def main(runner: Runner):
     runner.splash.append(dangers)
     runner.splash.append(score_text)
 
-    def reset():
+    def reset(game_start = False):
+        nonlocal peaceful_mode, game_begin_cooldown_frames
+
         player.center_x = 64
-        player.y = 128 - 32 - 20
+        player.y = -32
         player.x_velocity = 0
         player.y_velocity = 0
+        peaceful_mode = True
+        score_text.set_high_score_mode(True)
+        game_begin_cooldown_frames = 20
 
+        if not game_start:
+            squid.reset(score_text.score)
+        
         score_text.reset()
-        squid.reset()
 
         while len(dangers) > 0:
             dangers.pop()
 
+    def start():
+        nonlocal peaceful_mode
+
+        score_text.set_high_score_mode(False)
+        peaceful_mode = False
+
     def run_game_loop():
+        nonlocal peaceful_mode, game_begin_cooldown_frames
+
         movement_direction = 0
         if runner.input.left:
             movement_direction -= 1
@@ -68,17 +85,23 @@ def main(runner: Runner):
         if runner.input.right:
             movement_direction += 1
 
+        if peaceful_mode:
+            if runner.input.left and runner.input.right and \
+                game_begin_cooldown_frames == 0:
+                start()
+            
+            game_begin_cooldown_frames = max(0, game_begin_cooldown_frames - 1)
+
         player_hit = update_dangers(dangers, player, score_text)
         if player_hit:
-            print("Your score was:", score_text.score)
             reset()
             return
 
-        squid.update(player, dangers)
+        squid.update(player, dangers, peaceful_mode)
 
         player.update(movement_direction, runner.input.middle)
 
-    reset()
+    reset(True)
 
     target_fps = 30
     target_execution_time = 1.0 / target_fps
@@ -91,7 +114,7 @@ def main(runner: Runner):
         runner.refresh()
         if runner.check_exit():
             break
-        
+
         end_time = time.perf_counter()
         process_time = end_time - start_time
         sleep_time = target_execution_time - process_time
