@@ -462,7 +462,7 @@ while True:
         print ("Score: ", score)
         ate = True
 
-    # OLD CODE, DO NOT USE, PLEASE FOR THE LOVE OF GOD DO NOT USE THIS CODE, IT'S A MESS
+    # OLD CODE, DO NOT USE
 
     '''
     # door_1
@@ -645,6 +645,8 @@ while True:
                 score += score_increment
                 score_round_increment += score_penalty
     '''
+
+    # OLD CODE WARNING ends here, keep moving citizen
 
     warning_door_1, penalty_door_1 = handle_warning(
     warning_door_1, warning_door_1_sprite, door_1_sprite, door_control_menu_sprite, penalty_door_1, 96, 96

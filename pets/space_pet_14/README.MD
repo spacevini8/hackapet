@@ -27,6 +27,8 @@ The game **_isn't finished yet_** and probably won't be completed by the deadlin
 
 ## Use of AI
 
+(FOR EXTRA CLARITY)
+
 **SOME** AI **WAS** used in the making of this game, I mostly used it to debug and do some things I didn't know how to do, at least 85%-90% of the code is mine/copied **NOT** AI generated, ***I AM NOT A "VIBE CODER"***
 
 ## info
