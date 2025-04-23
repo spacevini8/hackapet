@@ -5,6 +5,7 @@ import displayio
 from sprites.base import FloatVelocitySprite, Sprite
 
 from sprites.spike import Spike
+from sprites.squid.dialogue import Dialouge, choose_dialogue
 from sprites.squid.eye import Eye
 from sprites.squid.mouth import Mouth
 from sprites.squid.predicted_player import PredictedPlayer
@@ -29,9 +30,15 @@ class Squid(Sprite):
     self._mouth.center_x = 64
     self._mouth.center_y = 57
 
+    self._dialouge = Dialouge()
+    self._dialouge.set_text("Hello human. Welcome to my simulation! Press Left+Right to start the \"fun\"")
+    self._dialouge.position = (64, 72)
+    self._dialouge.anchor = (0.5, 0.5)
+
     self.append(self._left_eye)
     self.append(self._right_eye)
     self.append(self._mouth)
+    self.append(self._dialouge)
 
     self.reset()
 
@@ -59,12 +66,15 @@ class Squid(Sprite):
   def bottom_extent(self):
     return max(self._left_eye.bottom_extent, self._right_eye.bottom_extent, self._mouth.bottom_extent)
 
-  def reset(self):
+  def reset(self, score_achieved: int = -1):
+    if score_achieved > -1:
+      self._dialouge.set_text(choose_dialogue(score_achieved))
+
     self._time_since_last_danger = -5
     self._danger_spawn_handicap = 10
     self._current_game_frames = 0
     self._handicap_lower_thresholds = HANDICAP_LOWER_FRAMES.copy()
-  
+
   def reset_danger_time(self, additional_handicap=0):
     # negative numbers means it has to go back t 0 first, increasing the delay
     self._time_since_last_danger = 0 - additional_handicap - self._danger_spawn_handicap
@@ -131,9 +141,15 @@ class Squid(Sprite):
 
     if self.spawn_spike(prediction.copy(), dangers):
       self.reset_danger_time()
-  
-  def update(self, player: FloatVelocitySprite, spikes: displayio.Group):
+
+  def update(self, player: FloatVelocitySprite, spikes: displayio.Group, peaceful_mode = False):
     self.track_player(player)
+    self._dialouge.update()
+    
+    if peaceful_mode:
+      return
+
+    self._dialouge.clear()
     self.spawn_danger(player, spikes)
 
     if len(self._handicap_lower_thresholds) > 0 and \

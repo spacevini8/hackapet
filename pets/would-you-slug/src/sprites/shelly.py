@@ -13,6 +13,8 @@ class Shelly(HitboxOffsetSprite, FloatVelocitySprite):
       pixel_shader=SHELLY_BITMAP.pixel_shader
     )
 
+    self.min_y = -32
+
     self._sprite.flip_x = True
     self.append(self._sprite)
 
